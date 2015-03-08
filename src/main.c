@@ -262,6 +262,7 @@ int main(int argc, char *argv[], char *envp[]) {
                                 libererVariable(mes_variables, var_name);
                                 mes_variables=ajouterVariable(mes_variables, var_name, var_value);
                             /*si la ligne vaut if(.*){ */
+                            //FIXME imbriquation condition !!
                             } else if (regex_match_const(tmp,TOKEN_IF_1)==0) {
                                 condition=1;
                                 if (regex_match(tmp,"\\(.*!=.*\\)")==0){
