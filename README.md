@@ -26,3 +26,44 @@ make uninstall
 
 Delete binary file :
 make clean
+
+============================================================================
+====================================WIKI====================================
+============================================================================
+
+#assign a variable:
+$my_variable=hello world !!
+
+#variable a display:
+$[my_variable]
+
+#naming a variable with another variable:
+$namevar=my_variable
+$\$[namevar]=hello world !!
+#display this variable:
+$[my_variable]
+
+#execute a command:
+<?ls?>
+#execute a command and store it in a variable:
+$my_variable=<?ls?>
+
+#execute and store the output of a python script or another language:
+#python:
+$python_example= <?python -c "print(\"$[my_variable], it is a python script !\")
+a=1
+b=2
+if a==2:
+    print(\"OK\")
+else:
+    print(\"NO\")"
+?>
+
+#php:
+$php_example=<?php -r "phpinfo();"?>
+
+#echo command Shell/Bash
+$echo_example= <?echo -n "<strong><strong>LS : </strong>liste des fichiers et r&eacute;pertoires :</strong><br>"
+ls | while read line; do 
+    echo -n "-$line<br>"
+done?>
