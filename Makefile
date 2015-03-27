@@ -17,4 +17,4 @@ install :
 uninstall :
 	sudo rm -f /usr/bin/lw
 clean :
-	rm -f lw
+	rm -f lw 

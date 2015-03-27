@@ -18,4 +18,4 @@ const char TOKEN_VAR_TYPE_FILEUPLOAD_1[]="(^Content-Type: .*)";
 /*definitions conditions*/
 const char TOKEN_IF_1[]="^if\\(.*\\)\\{";
 const char TOKEN_ELSE_1[]="^\\}else\\{";
-const char TOKEN_IF_ELSE_END_1[]="^\\}";
+const char TOKEN_IF_ELSE_END_1[]="^\\}"; 
