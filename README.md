@@ -27,9 +27,8 @@ make uninstall
 Delete binary file :
 make clean
 
-======================================
-=================WIKI=================
-======================================
+
+=============WIKI=============
 
 #assign a variable: 
 $my_variable=hello world !!
