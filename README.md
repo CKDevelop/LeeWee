@@ -31,7 +31,7 @@ make clean
 ====================================WIKI====================================
 ============================================================================
 
-#assign a variable:
+#assign a variable: 
 $my_variable=hello world !!
 
 #variable a display:
