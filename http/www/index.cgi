@@ -37,7 +37,7 @@ $\$[mot]=Welcome in LeeWee Script
                 Text2 :<textarea name="txt2_post" >$[txt2_post]</textarea><br>
                 <input type="submit" value="Valider">
             </form>
-        </fieldset>
+        </fieldset> 
         
         <fieldset>
             <legend>Exemple formulaire POST FILE :</legend>
