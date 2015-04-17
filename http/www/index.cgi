@@ -86,16 +86,18 @@ $\$[mot]=Welcome in LeeWee Script
             $[ls]
             
             $a=1
-            $b=3
-            $[a]==$[b]
-            if($[a]=$[b]){
+            $b=1
+            $c=4
+
+            <br>condition: $a=$[a] avec $b=$[b]
+            if($[a]==$[b]){
                 <br><strong>condition 1 [OK] Line 1</strong><br><br>
                 if($[a]!=$[b]){
                     <br><strong>condition 2 [NO] Line 1</strong>
                     <br><strong>condition 2 [NO] Line 2</strong><br><br>
                 }else{
                     <br><strong>condition 2 [OK] Line 1</strong><br>
-                    if($[a]=$[b]){
+                    if($[a]==$[b]){
                         <br><strong>condition 3 [OK] Line 1</strong>
                         <br><strong>condition 3 [OK] Line 2</strong><br>
                         $ls=RE-modification de la variable $ls<br><br>
@@ -107,8 +109,21 @@ $\$[mot]=Welcome in LeeWee Script
                     <br><strong>condition 2 [OK] Line 2</strong><br><br>
                 }
                 <br><strong>condition 1 [OK] Line 2</strong><br><br>
+                
+                <br>condition: 1 avec $b=$[b]
+                if(1==$[b]){
+                    <br><strong>sub condition 1 [OK] Line 3</strong><br><br>
+                }else{
+                    <br><strong>sub condition 1 [NO] Line 3</strong><br><br>
+                }
+                
             }else{
-                <br><strong>condition 1 [NO] Line 1</strong><br><br>
+                <br>condition: $c=$[c] avec $b=$[b]
+                if($[c]==4){
+                    <br><strong>sub condition 1 [NO] Line 2-1</strong><br><br>
+                } else {
+                    <br><strong>sub condition 1 [NO] Line 2-2</strong><br><br>
+                }
             }
             <br>
             $[python1]

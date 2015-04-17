@@ -168,6 +168,7 @@ int main(int argc, char *argv[], char *envp[]) {
     
     int pos_html=0;
     int condition=0;
+    int condition_old_tmp=-1;
     int condition_old=-1;
     int condition_count=-1;
     int condition_etat=-1;
@@ -264,45 +265,45 @@ int main(int argc, char *argv[], char *envp[]) {
                                 mes_variables=ajouterVariable(mes_variables, var_name, var_value);
                             /*si la ligne vaut if(.*){ */
                             //FIXME imbriquation condition !!
-                            } else if (regex_match_const(tmp,TOKEN_IF_1)==0) {
+                            } else if (regex_match_const(tmp,TOKEN_IF_1)==0 ) {
                                 condition=1;
                                 if (condition_old>-1) {
-                                    
                                     condition_count++;
                                     condition_etat=1;
                                 } else {
-                                if (regex_match(tmp,"\\(.*!=.*\\)")==0){
-                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*!=)"),strlen(regex(tmp,"(\\(.*!=)"))-2,2,""),0,1,"");
-                                    var_value=str_replace(str_replace(regex(tmp,"(!=.*\\))"),strlen(regex(tmp,"(!=.*\\))"))-1,1,""),0,2,"");
-                                    condition_count++;
-                                    if (strcmp(var_name, var_value)==0) {
-                                        condition_etat=1;
-                                        CONDITION[condition_count]=1;
-                                        condition_old=condition_count;
-                                    } else {
-                                        condition_etat=0;
-                                        CONDITION[condition_count]=0;
-                                        condition_old=-1;
-                                    }
-                                } else if (regex_match(tmp,"\\(.*=.*\\)")==0){
-                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*=)"),strlen(regex(tmp,"(\\(.*=)"))-1,1,""),0,1,"");
-                                    var_value=str_replace(str_replace(regex(tmp,"(=.*\\))"),strlen(regex(tmp,"(=.*\\))"))-1,1,""),0,1,"");
-                                    condition_count++;
-                                    if (strcmp(var_name, var_value)==0) {
-                                        condition_etat=0;
-                                        CONDITION[condition_count]=0;
-                                        condition_old=-1;
-                                        
-                                    } else {
-                                        condition_etat=1;
-                                        CONDITION[condition_count]=1;
-                                        condition_old=condition_count;
+                                    if (regex_match(tmp,"\\(.*!=.*\\)")==0){
+                                        var_name=str_replace(str_replace(regex(tmp,"(\\(.*!=)"),strlen(regex(tmp,"(\\(.*!=)"))-2,2,""),0,1,"");
+                                        var_value=str_replace(str_replace(regex(tmp,"(!=.*\\))"),strlen(regex(tmp,"(!=.*\\))"))-1,1,""),0,2,"");
+                                        condition_count++;
+                                        if (strcmp(var_name, var_value)==0) {
+                                            condition_etat=1;
+                                            CONDITION[condition_count]=1;
+                                            condition_old=condition_count;
+                                        } else {
+                                            condition_etat=0;
+                                            CONDITION[condition_count]=0;
+                                            condition_old=-1;
+                                        }
+                                    } else if (regex_match(tmp,"\\(.*==.*\\)")==0){
+                                        var_name=str_replace(str_replace(regex(tmp,"(\\(.*==)"),strlen(regex(tmp,"(\\(.*==)"))-2,2,""),0,1,"");
+                                        var_value=str_replace(str_replace(regex(tmp,"(==.*\\))"),strlen(regex(tmp,"(==.*\\))"))-1,1,""),0,2,"");
+                                        condition_count++;
+                                        if (strcmp(var_name, var_value)==0) {
+                                            condition_etat=0;
+                                            CONDITION[condition_count]=0;
+                                            condition_old=-1;
+                                            
+                                        } else {
+                                            condition_etat=1;
+                                            CONDITION[condition_count]=1;
+                                            condition_old=condition_count;
+                                        }
                                     }
                                 }
-                                }
-                            } else if (regex_match_const(tmp,TOKEN_ELSE_1)==0){
+                            } else if (regex_match_const(tmp,TOKEN_ELSE_1)==0){ 
                                 if (condition_old!=condition_count && condition_old>-1) {
                                     condition_etat=1;
+
                                 } else {
                                     if (condition==1 && CONDITION[condition_count]==1 ) {
                                         CONDITION[condition_count]=1;
@@ -312,21 +313,23 @@ int main(int argc, char *argv[], char *envp[]) {
                                         condition_etat=1;
                                     }
                                     condition_old=-1;
+                                    
                                 }
                             } else if (regex_match_const(tmp,TOKEN_IF_ELSE_END_1)==0){
                                 if (condition_old!=condition_count && condition_old>-1) {
                                     condition_etat=1;
+
                                     condition_count--;
-                                    
                                 } else {
                                     condition_count--;
-                                    
-                                    if (condition_count>=0) {
+                                    if (condition_count>=0 ) {
+                                        if (CONDITION[condition_count]==1){
                                         condition_etat=0;
+                                        }else {
+                                        condition_etat=1;
+                                        }
                                         condition=1;
-                                        
                                     } else {
-
                                         condition_etat=0;
                                         condition=0;
                                     }
