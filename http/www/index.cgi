@@ -86,7 +86,7 @@ $\$[mot]=Welcome in LeeWee Script
             $[ls]
             
             $a=1
-            $b=1
+            $b=2
             $c=4
 
             <br>condition: $a=$[a] avec $b=$[b]
@@ -97,7 +97,7 @@ $\$[mot]=Welcome in LeeWee Script
                     <br><strong>condition 2 [NO] Line 2</strong><br><br>
                 }else{
                     <br><strong>condition 2 [OK] Line 1</strong><br>
-                    if($[a]==$[b]){
+                    if($[a]==1){
                         <br><strong>condition 3 [OK] Line 1</strong>
                         <br><strong>condition 3 [OK] Line 2</strong><br>
                         $ls=RE-modification de la variable $ls<br><br>
@@ -118,9 +118,9 @@ $\$[mot]=Welcome in LeeWee Script
                 }
                 
             }else{
-                <br>condition: $c=$[c] avec $b=$[b]
+                <br>condition: $c=$[c] avec 4
                 if($[c]==4){
-                    <br><strong>sub condition 1 [NO] Line 2-1</strong><br><br>
+                    <br><strong>sub condition 1 [OK] Line 2-1</strong><br><br>
                 } else {
                     <br><strong>sub condition 1 [NO] Line 2-2</strong><br><br>
                 }
