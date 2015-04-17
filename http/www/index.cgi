@@ -86,27 +86,29 @@ $\$[mot]=Welcome in LeeWee Script
             $[ls]
             
             $a=1
-            $b=$[a]
+            $b=3
+            $[a]==$[b]
             if($[a]=$[b]){
-                <br><strong>condition 1 True Line 1</strong><br><br>
+                <br><strong>condition 1 [OK] Line 1</strong><br><br>
                 if($[a]!=$[b]){
-                    <br><strong>condition 2 True Line 1</strong>
-                    <br><strong>condition 2 True Line 2</strong><br><br>
+                    <br><strong>condition 2 [NO] Line 1</strong>
+                    <br><strong>condition 2 [NO] Line 2</strong><br><br>
                 }else{
-                    <br><strong>condition 2 False Line 1</strong><br>
+                    <br><strong>condition 2 [OK] Line 1</strong><br>
                     if($[a]=$[b]){
-                        <br><strong>condition 3 True Line 1</strong>
-                        <br><strong>condition 3 True Line 2</strong><br>
+                        <br><strong>condition 3 [OK] Line 1</strong>
+                        <br><strong>condition 3 [OK] Line 2</strong><br>
                         $ls=RE-modification de la variable $ls<br><br>
                         $[ls]
                     }else{
-                        <br><strong>condition 3 False Line 1</strong>
-                        <br><strong>condition 3 False Line 2</strong><br><br>
+                        <br><strong>condition 3 [NO] Line 1</strong>
+                        <br><strong>condition 3 [NO] Line 2</strong><br><br>
                     }
-                    <br><strong>condition 2 False Line 2</strong><br><br>
+                    <br><strong>condition 2 [OK] Line 2</strong><br><br>
                 }
+                <br><strong>condition 1 [OK] Line 2</strong><br><br>
             }else{
-                <br><strong>condition 1 False Line 1</strong><br><br>
+                <br><strong>condition 1 [NO] Line 1</strong><br><br>
             }
             <br>
             $[python1]
