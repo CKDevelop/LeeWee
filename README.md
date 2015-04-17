@@ -1,4 +1,4 @@
-LeeWee Script version 0.9 alpha 2015-03-07
+LeeWee Script version 0.9.1 alpha 2015-04-17
 by David Lhoumaud
 craft@ckdevelop.org
 www.ckdevelop.org
