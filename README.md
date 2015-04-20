@@ -43,39 +43,39 @@ $\$[namevar]=hello world !!
 $[my_variable]
 
 #execute a command:
-<?ls?>
+&lsaquo;?ls?&rsaquo;
 #execute a command and store it in a variable:
-$my_variable=<?ls?>
+$my_variable=&lsaquo;?ls?&rsaquo;
 
 #execute and store the output of a python script or another language:
 ##python:
-$python_example= <?python -c "print(\"$[my_variable], it is a python script !\")
+$python_example= &lsaquo;?python -c "print(\"$[my_variable], it is a python script !\")
 a=1
 b=2
 if a==2:
     print(\"OK\")
 else:
     print(\"NO\")"
-?>
+?&rsaquo;
 
 ##php:
-$php_example=<?php -r "phpinfo();"?>
+$php_example=&lsaquo;?php -r "phpinfo();"?&rsaquo;
 
 #echo command Shell/Bash
-$echo_example= <?echo -n "<strong><strong>LS : </strong>liste des fichiers et r&eacute;pertoires :</strong><br>"
+$echo_example= &lsaquo;?echo -n "&lsaquo;strong&rsaquo;&lsaquo;strong&rsaquo;LS : &lsaquo;/strong&rsaquo;liste des fichiers et r&eacute;pertoires :&lsaquo;/strong&rsaquo;&lsaquo;br&rsaquo;"
 ls | while read line; do 
-    echo -n "-$line<br>"
-done?>
+    echo -n "-$line&lsaquo;br&rsaquo;"
+done?&rsaquo;
 
 #condition IF/ELSE
 ##simple IF
 if ($[my_variable]==) {
-    <strong>variable empty</strong>
+    &lsaquo;strong&rsaquo;variable empty&lsaquo;/strong&rsaquo;
 }
 
 ##IF and ELSE
 if ($[my_variable]!=) {
-    <strong>variable not empty</strong>
+    &lsaquo;strong&rsaquo;variable not empty&lsaquo;/strong&rsaquo;
 } else {
-    <strong>variable empty</strong>
+    &lsaquo;strong&rsaquo;variable empty&lsaquo;/strong&rsaquo;
 }
