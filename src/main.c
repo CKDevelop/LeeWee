@@ -202,7 +202,12 @@ int main(int argc, char *argv[], char *envp[]) {
         }
     }
 
-    FILE *SCRIPT = fopen (argv[1], "r");
+    FILE *SCRIPT = NULL;
+    if (argc < 2) {
+        SCRIPT = stdin;
+    } else {
+        SCRIPT = fopen (argv[1], "r");
+    }
     if (SCRIPT) {
         while(fgets(ligne_courante, LG_MAX, SCRIPT) != NULL) {
             for(i=0;i<=strlen(ligne_courante);i++) {
