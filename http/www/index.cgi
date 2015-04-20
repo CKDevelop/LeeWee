@@ -85,8 +85,9 @@ $\$[mot]=Welcome in LeeWee Script
             $ls=<?echo "modification de la variable \$ls<br><br>"?>
             $[ls]
             
+            #bascule change la valeur de la variable $b pour tester la condition
             $a=1
-            $b=2
+            $b=1
             $c=4
 
             <br>condition: $a=$[a] avec $b=$[b]
@@ -121,7 +122,7 @@ $\$[mot]=Welcome in LeeWee Script
                 <br>condition: $c=$[c] avec 4
                 if($[c]==4){
                     <br><strong>sub condition 1 [OK] Line 2-1</strong><br><br>
-                } else {
+                }else{
                     <br><strong>sub condition 1 [NO] Line 2-2</strong><br><br>
                 }
             }
