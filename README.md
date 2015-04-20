@@ -1,4 +1,4 @@
-LeeWee Script version 0.9.1 alpha 2015-04-17
+LeeWee Script version 1 2015-04-17
 by David Lhoumaud
 craft@ckdevelop.org
 www.ckdevelop.org
@@ -48,7 +48,7 @@ $[my_variable]
 $my_variable=<?ls?>
 
 #execute and store the output of a python script or another language:
-#python:
+##python:
 $python_example= <?python -c "print(\"$[my_variable], it is a python script !\")
 a=1
 b=2
@@ -58,7 +58,7 @@ else:
     print(\"NO\")"
 ?>
 
-#php:
+##php:
 $php_example=<?php -r "phpinfo();"?>
 
 #echo command Shell/Bash
@@ -66,3 +66,16 @@ $echo_example= <?echo -n "<strong><strong>LS : </strong>liste des fichiers et r&
 ls | while read line; do 
     echo -n "-$line<br>"
 done?>
+
+#condition IF/ELSE
+##simple IF
+if ($[my_variable]==) {
+    <strong>variable empty</strong>
+}
+
+##IF and ELSE
+if ($[my_variable]!=) {
+    <strong>variable not empty</strong>
+} else {
+    <strong>variable empty</strong>
+}

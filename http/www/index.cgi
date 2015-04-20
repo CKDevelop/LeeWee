@@ -13,8 +13,8 @@ $title= Welcome
 
 $python1= <?python -c "print(\"$[title], it is a python script !\")
 a=1
-b=2
-if a==2:
+b=1
+if a==b:
     print(\"OK\")
 else:
     print(\"NO\")"
@@ -22,7 +22,7 @@ else:
 
 $titlePerl= <?perl -e "print '$[title] in LeeWee'"?>
 $mot=welcome
-$\$[mot]=Welcome in LeeWee Script
+$\$[mot]=$[title] in LeeWee Script
 
 <html>
     <head>
