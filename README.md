@@ -68,7 +68,6 @@ if a==2:
 else:
 
     print(\"NO\")"
-
 ?&rsaquo;
 
 ##php:
@@ -78,7 +77,7 @@ $php_example=&lsaquo;?php -r "phpinfo();"?&rsaquo;
 $echo_example= &lsaquo;?echo -n "&lsaquo;strong&rsaquo;&lsaquo;strong&rsaquo;LS : &lsaquo;/strong&rsaquo;liste des fichiers et r&eacute;pertoires :&lsaquo;/strong&rsaquo;&lsaquo;br&rsaquo;"
 ls | while read line; do
 
-    echo -n "-$line&lsaquo;br&rsaquo;"
+    echo -n "-$line<br>"
 
 done?&rsaquo;
 
@@ -86,17 +85,17 @@ done?&rsaquo;
 ##simple IF
 if ($[my_variable]==) {
 
-    &lsaquo;strong&rsaquo;variable empty&lsaquo;/strong&rsaquo;
+    variable empty
 
 }
 
 ##IF and ELSE
 if ($[my_variable]!=) {
 
-    &lsaquo;strong&rsaquo;variable not empty&lsaquo;/strong&rsaquo;
+    variable not empty
 
 } else {
 
-    &lsaquo;strong&rsaquo;variable empty&lsaquo;/strong&rsaquo;
+    variable empty
 
 }
