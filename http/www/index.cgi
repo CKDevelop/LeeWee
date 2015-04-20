@@ -87,11 +87,11 @@ $\$[mot]=Welcome in LeeWee Script
             
             #bascule change la valeur de la variable $b pour tester la condition
             $a=1
-            $b=1
+            $b=2
             $c=4
 
             <br>condition: $a=$[a] avec $b=$[b]
-            if($[a]==$[b]){
+            if ($[a]==$[b])      {
                 <br><strong>condition 1 [OK] Line 1</strong><br><br>
                 if($[a]!=$[b]){
                     <br><strong>condition 2 [NO] Line 1</strong>
@@ -118,9 +118,9 @@ $\$[mot]=Welcome in LeeWee Script
                     <br><strong>sub condition 1 [NO] Line 3</strong><br><br>
                 }
                 
-            }else{
+            }    else {
                 <br>condition: $c=$[c] avec 4
-                if($[c]==4){
+                if($[c]==4)     {
                     <br><strong>sub condition 1 [OK] Line 2-1</strong><br><br>
                 }else{
                     <br><strong>sub condition 1 [NO] Line 2-2</strong><br><br>
