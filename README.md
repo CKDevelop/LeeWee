@@ -28,7 +28,8 @@ Delete binary file :
 make clean
 
 
-=============WIKI=============
+WIKI
+====
 
 #assign a variable: 
 $my_variable=hello world !!
@@ -69,9 +70,9 @@ done?&rsaquo;
 
 #condition IF/ELSE
 ##simple IF
-if ($[my_variable]==) {
-    &lsaquo;strong&rsaquo;variable empty&lsaquo;/strong&rsaquo;
-}
+if ($[my_variable]==) {.
+    &lsaquo;strong&rsaquo;variable empty&lsaquo;/strong&rsaquo;.
+}.
 
 ##IF and ELSE
 if ($[my_variable]!=) {
