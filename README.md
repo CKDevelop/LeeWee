@@ -1,4 +1,4 @@
-LeeWee Script version 1 2015-04-20
+LeeWee Script version 1.0 2015-04-20
 ==================================
 by David Lhoumaud
 
@@ -44,7 +44,9 @@ $[my_variable]
 
 #naming a variable with another variable:
 $namevar=my_variable
+
 $\$[namevar]=hello world !!
+
 #display this variable:
 $[my_variable]
 
