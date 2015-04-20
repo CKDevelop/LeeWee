@@ -1,30 +1,35 @@
-LeeWee Script version 1 2015-04-17
+LeeWee Script version 1 2015-04-20
+==================================
 by David Lhoumaud
+
 craft@ckdevelop.org
+
 www.ckdevelop.org
 
-An example script is available in the directory :
+
+
+###An example script is available in the directory :
 http/www/index.cgi 
 
-Compilation :
+###Compilation :
 make
 
-Test http://localhost:8080/index.cgi :
+###Test http://localhost:8080/index.cgi :
 make test
 
-Install color scheme for gtksourceview :
+###Install color scheme for gtksourceview :
 make color
 
-Uninstall color scheme for gtksourceview :
+###Uninstall color scheme for gtksourceview :
 make uncolor
 
-Install binary file in /usr/bin/ :
+###Install binary file in /usr/bin/ :
 make install
 
-Uninstall binary file of /usr/bin/ :
+###Uninstall binary file of /usr/bin/ :
 make uninstall
 
-Delete binary file :
+###Delete binary file :
 make clean
 
 
@@ -51,12 +56,19 @@ $my_variable=&lsaquo;?ls?&rsaquo;
 #execute and store the output of a python script or another language:
 ##python:
 $python_example= &lsaquo;?python -c "print(\"$[my_variable], it is a python script !\")
+
 a=1
+
 b=2
+
 if a==2:
+
     print(\"OK\")
+
 else:
+
     print(\"NO\")"
+
 ?&rsaquo;
 
 ##php:
@@ -64,19 +76,27 @@ $php_example=&lsaquo;?php -r "phpinfo();"?&rsaquo;
 
 #echo command Shell/Bash
 $echo_example= &lsaquo;?echo -n "&lsaquo;strong&rsaquo;&lsaquo;strong&rsaquo;LS : &lsaquo;/strong&rsaquo;liste des fichiers et r&eacute;pertoires :&lsaquo;/strong&rsaquo;&lsaquo;br&rsaquo;"
-ls | while read line; do 
+ls | while read line; do
+
     echo -n "-$line&lsaquo;br&rsaquo;"
+
 done?&rsaquo;
 
 #condition IF/ELSE
 ##simple IF
-if ($[my_variable]==) {.
-    &lsaquo;strong&rsaquo;variable empty&lsaquo;/strong&rsaquo;.
-}.
+if ($[my_variable]==) {
+
+    &lsaquo;strong&rsaquo;variable empty&lsaquo;/strong&rsaquo;
+
+}
 
 ##IF and ELSE
 if ($[my_variable]!=) {
+
     &lsaquo;strong&rsaquo;variable not empty&lsaquo;/strong&rsaquo;
+
 } else {
+
     &lsaquo;strong&rsaquo;variable empty&lsaquo;/strong&rsaquo;
+
 }
