@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include <stdio.h>
+#include <unistd.h>
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -11,13 +12,13 @@
 
 #define LG_MAX 40960
 
-static char *ENV[LG_MAX];
-
 #include "regex.c"
 #include "regex_const.c"
 #include "str.c"
 #include "console.c"
+#include "markers.c"
 #include "variables.c"
+
 
 #include "tokens.h"
 
@@ -150,60 +151,34 @@ int uploadFile() {
     } else return 0;
 }
 
-int main(int argc, char *argv[], char *envp[]) {
-    char c;
-    int i;
-    char *tmp = (char *)malloc(sizeof(char) * LG_MAX);
-
-    char *ligne_courante = (char *)malloc (sizeof(char) * LG_MAX);
-     
-    int ctmp=0;
-    int multiline=0;
-    int pstr=-1;
-    char *tmp_tmp = (char *)malloc(sizeof(char) * LG_MAX);
-    char *tmp_tmp_tmp = (char *)malloc(sizeof(char) * LG_MAX);
-    int display_var=0;
-    char *var_name=(char *)malloc (sizeof (char) * LG_MAX);
-    char *var_value=(char *)malloc (sizeof (char) * LG_MAX);
-    
-    int pos_html=0;
-    int condition=0;
-    int condition_count=-1;
-    int condition_etat=0;
-    char **tableau_value = NULL;
-    int CONDITION[LG_MAX];
-
-    char* GET;
-    if((GET=getenv("QUERY_STRING"))) {
-        urldecode(GET);
-        getVarsRequest(GET);
-    }
-    char* REQUESTMETHOD;
-    int fileup=0;
-    REQUESTMETHOD=getenv("REQUEST_METHOD");
-    if (str_istr(REQUESTMETHOD,"POST")> -1 ) {
-        int content_length;
-        char *POST ;
-        if ( strcasecmp(getenv("CONTENT_TYPE"), "application/x-www-form-urlencoded")) {
-            if( strcmp(getenv("CONTENT_TYPE"), "multipart/form-data")) {
-                //Upload file
-                fileup=uploadFile();
-            } else dbg("LeeWee: Unsupported Content-Type.\n") ;
-        }
-        if (fileup==0) {
-            if ( !(content_length = atoi(getenv("CONTENT_LENGTH"))))
-                dbg("LeeWee: No Content-Length was sent with the POST request.\n") ;
-            if ( !(POST= (char *) malloc(content_length+1)))
-                dbg("LeeWee: Couldn't malloc for POST.\n");
-            if (!fread(POST, content_length, 1, stdin))
-                dbg("LeeWee: Couldn't read CGI input from STDIN.\n");
-            urldecode(POST);
-            getVarsRequest(POST);
-        }
-    }
-
-    FILE *SCRIPT = fopen (argv[1], "r");
+//Analyse d'un script
+int parseScript(char *scriptname, int pos_html) {
+    FILE *SCRIPT=fopen(scriptname, "rb");
     if (SCRIPT) {
+        char c;
+        int i;
+        char *tmp = (char *)malloc(sizeof(char) * LG_MAX);
+
+        char *ligne_courante = (char *)malloc (sizeof(char) * LG_MAX);
+         
+        int ctmp=0;
+        int multiline=0;
+        int pstr=-1;
+        char *tmp_tmp = (char *)malloc(sizeof(char) * LG_MAX);
+        char *tmp_tmp_tmp = (char *)malloc(sizeof(char) * LG_MAX);
+        int display_var=0;
+        char *var_name=(char *)malloc (sizeof (char) * LG_MAX);
+        char *var_value=(char *)malloc (sizeof (char) * LG_MAX);
+
+        long tmppos ;
+    /*    char currentPath[LG_MAX];*/
+    /*    getcwd(currentPath, LG_MAX);*/
+        
+        int condition=0;
+        int condition_count=-1;
+        int condition_etat=0;
+        char **tableau_value = NULL;
+        int CONDITION[LG_MAX];
         while(fgets(ligne_courante, LG_MAX, SCRIPT) != NULL) {
             for(i=0;i<=strlen(ligne_courante);i++) {
                 c= ligne_courante[i];
@@ -213,7 +188,8 @@ int main(int argc, char *argv[], char *envp[]) {
                         //si ça ne commence pas par # (commentaire) alors...
                         if ( ((tmp[0] != '#' && multiline==0) || (multiline==1)) && (tmp[0] != 0) ) {
                             /*si la ligne vaut $var=<? cmd ?>*/
-                            if ((regex_match_const(tmp,TOKEN_VAR_1)==0 || regex_match_const(tmp,TOKEN_VAR_2)==0) && (multiline==0) && (condition_etat!=1)){
+                            if ((regex_match_const(tmp,TOKEN_VAR_1)==0 || regex_match_const(tmp,TOKEN_VAR_2)==0) && (multiline==0) ){
+                                if ((condition==1 && condition_etat >0) || (condition==0)) {
                                 var_name=regex_const(regex_const(tmp,TOKEN_VAR_NAME_1),TOKEN_VAR_NAME_2);
                                 tmp_tmp=regex(tmp,"(<\\?.*\\?>$)");
                                 tmp_tmp=str_replace(tmp_tmp,0,2,"");
@@ -222,6 +198,7 @@ int main(int argc, char *argv[], char *envp[]) {
                                 var_value=shell(tmp_tmp);
                                 libererVariable(mes_variables, var_name);
                                 mes_variables=ajouterVariable(mes_variables, var_name, var_value);
+                                }
 
                             /*si la ligne vaut $var=<? cmd*/
                             } else if ((regex_match_const(tmp,TOKEN_VAR_START_1)==0 || regex_match_const(tmp,TOKEN_VAR_START_2)==0) && (multiline==0) && (condition_etat!=1)){
@@ -253,20 +230,21 @@ int main(int argc, char *argv[], char *envp[]) {
                                 strncat(tmp, "\n", 1);
 
                             /*si la ligne vaut $var=str*/
-                            } else if ((regex_match_const(tmp,TOKEN_VAR_3)==0) && (multiline==0) && (condition_etat!=1)){
-                                var_name=regex_const(regex_const(tmp,TOKEN_VAR_NAME_1),TOKEN_VAR_NAME_2);
-                                tmp_tmp=regex(tmp,"(=.*$)");
-                                tmp_tmp=str_replace(tmp_tmp,0,1,"");
-                                var_value=tmp_tmp;
-                               //printf("##%s == %s\n",var_name,var_value);
-                                libererVariable(mes_variables, var_name);
-                                mes_variables=ajouterVariable(mes_variables, var_name, var_value);
+                            } else if ((regex_match_const(tmp,TOKEN_VAR_3)==0) && (multiline==0)){
+                                if ((condition==1 && condition_etat >0) || (condition==0)) {
+                                    var_name=regex_const(regex_const(tmp,TOKEN_VAR_NAME_1),TOKEN_VAR_NAME_2);
+                                    tmp_tmp=regex(tmp,"(=.*$)");
+                                    tmp_tmp=str_replace(tmp_tmp,0,1,"");
+                                    var_value=tmp_tmp;
+                                   //printf("##%s == %s\n",var_name,var_value);
+                                    libererVariable(mes_variables, var_name);
+                                    mes_variables=ajouterVariable(mes_variables, var_name, var_value);
+                                }
                             /*si la ligne vaut if(.*){ */
-                            //FIXME imbriquation condition !!
+                            //imbriquation condition
                             } else if (regex_match_const(tmp,TOKEN_IF_1)==0 || regex_match_const(tmp,TOKEN_IF_2)==0 || regex_match_const(tmp,TOKEN_IF_3)==0 || regex_match_const(tmp,TOKEN_IF_4)==0) {
                                 //condition = 1 alors condition activé
                                 // condition_etat= 1 alors condition vraie
-
                                 condition=1;
                                 condition_count++; 
                                 if (CONDITION[condition_count-1]==0){
@@ -318,6 +296,31 @@ int main(int argc, char *argv[], char *envp[]) {
                                         condition=0;
                                         condition_etat=0;
                                     }
+                            } else if (regex_match_const(tmp,TOKEN_INCLUDE_1)==0 || regex_match_const(tmp,TOKEN_INCLUDE_2)==0){
+                                if ((condition==1 && condition_etat > 0) || (condition==0)) {
+                                    tmp_tmp=regex(tmp,"\\((.*)\\)");
+                                    tmp_tmp_tmp=str_replace(tmp_tmp,0,1,"");
+                                    tmp_tmp_tmp=str_replace(tmp_tmp_tmp,strlen(tmp_tmp_tmp)-1,1,"");
+                                    parseScript(tmp_tmp_tmp, 1);
+                                }
+                            } else if (regex_match_const(tmp,TOKEN_MARKER_SET)==0){
+                                tmp_tmp=regex(tmp,"^:(.*)");
+                                var_name=str_replace(tmp_tmp,0,1,"");
+                                libererMarker(mes_markers, var_name);
+                                tmppos = ftell (SCRIPT);
+                                mes_markers=ajouterMarker(mes_markers, var_name, tmppos);
+                                //printf("%s->%d", var_name, afficherMarker(mes_markers, var_name));
+                            } else if (regex_match_const(tmp,TOKEN_MARKER_GET)==0){
+                                if ((condition==1 && condition_etat > 0) || (condition==0)) {
+                                    tmp_tmp=regex(tmp,"^->(.*)");
+                                    var_name=str_replace(tmp_tmp,0,2,"");
+                                    condition=0;
+                                    condition_etat = 0;
+                                    condition_count=-1;
+                                    fseek( SCRIPT, afficherMarker(mes_markers, var_name), SEEK_SET );
+                                    //printf("%s->%d", var_name, afficherMarker(mes_markers, var_name));
+                                }
+                                
                             } else {
                                 if (pos_html<=0) {
                                     printf("Content-type: text/html;charset=utf-8\n\n");
@@ -328,7 +331,8 @@ int main(int argc, char *argv[], char *envp[]) {
                             }
                         }
                         
-                        if (multiline==0) bzero(tmp, LG_MAX);
+                        if (multiline==0) memset(tmp, 0, LG_MAX);
+                        memset(ligne_courante, 0, LG_MAX);
                         break;
                     case '$':
                         display_var=1;
@@ -370,21 +374,56 @@ int main(int argc, char *argv[], char *envp[]) {
                 }
             }
         }
-        
-        //for(i = 0; envp[i] != NULL; i++) printf("%s<br>\n", envp[i]); 
-        
-       //afficherListeVariables(mes_variables);
-        libererListeVariables(mes_variables);
+        fclose(SCRIPT);
         free(tmp);
         free(tmp_tmp);
-        for(i=0;ENV[i]!=NULL;i++)
-            free(ENV[i]);
-        printf("\n");
+        free(tmp_tmp_tmp);
+        free(ligne_courante);
+        free(var_name);
+        free(tableau_value);
         return 0;
-    
     } else {
-        printf("LeeWee by David Lhoumaud\nGnu/GPL\n\nUsage : lw <FILENAME>\nExemple : lw index.cgi\n");
+        return 1;
+    }
+
+}
+
+int main(int argc, char *argv[], char *envp[]) {
+    char* GET;
+    if((GET=getenv("QUERY_STRING"))) {
+        urldecode(GET);
+        getVarsRequest(GET);
+    }
+    char* REQUESTMETHOD;
+    char *POST ;
+    int fileup=0;
+    REQUESTMETHOD=getenv("REQUEST_METHOD");
+    if (str_istr(REQUESTMETHOD,"POST")> -1 ) {
+        int content_length;
+        if ( strcasecmp(getenv("CONTENT_TYPE"), "application/x-www-form-urlencoded")) {
+            if( strcmp(getenv("CONTENT_TYPE"), "multipart/form-data")) {
+                //Upload file
+                fileup=uploadFile();
+            } else dbg("LeeWee: Unsupported Content-Type.\n") ;
+        }
+        if (fileup==0) {
+            if ( !(content_length = atoi(getenv("CONTENT_LENGTH"))))
+                dbg("LeeWee: No Content-Length was sent with the POST request.\n") ;
+            if ( !(POST= (char *) malloc(content_length+1)))
+                dbg("LeeWee: Couldn't malloc for POST.\n");
+            if (!fread(POST, content_length, 1, stdin))
+                dbg("LeeWee: Couldn't read CGI input from STDIN.\n");
+            urldecode(POST);
+            getVarsRequest(POST);
+            
+        }
+    }
+    if (parseScript(argv[1], 0)==0){
+        libererListeVariables(mes_variables);
         return 0;
+    } else {
+        printf("LeeWee Script by David Lhoumaud\nGnu/GPL\n\nUsage : lw <FILENAME>\nExemple : lw index.cgi\n");
+        return 1;
     }
 
 }

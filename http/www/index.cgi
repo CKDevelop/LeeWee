@@ -1,134 +1,36 @@
 #! ./../../lw
 
-$ii=aa
-$ipa=<?/sbin/ifconfig | grep 'inet adr' | cut -d: -f2 | cut -d' ' -f1?>
-$ifconfig=<?/sbin/ifconfig?>
-
-$ls= <?echo -n "<strong><strong>LS : </strong>liste des fichiers et r&eacute;pertoires :</strong><br>"
-ls | while read line; do 
-    echo -n "-$line<br>"
-done?>
-$env= <?env?>
-$title= Welcome
-
-$python1= <?python -c "print(\"$[title], it is a python script !\")
-a=1
-b=1
-if a==b:
-    print(\"OK\")
-else:
-    print(\"NO\")"
-?>
-
-$titlePerl= <?perl -e "print '$[title] in LeeWee'"?>
-$mot=welcome
-$\$[mot]=$[title] in LeeWee Script
-
+$title=Welcome
+$titlePerl= <?perl -e "print '$[title] in LeeWee Script'"?>
+$titleGET=Exemple formulaire GET :
+$titleIF=Exemple condition IF :
+$test1=0
 <html>
     <head>
         <title >$[titlePerl] </title>
     </head>
     <body>
-        <h1>$[welcome]</h1>
         <fieldset>
-            <legend>Exemple formulaire POST :</legend>
-            <form method="POST">
-                Text1 :<input type="text" name="txt_post" value="$[txt_post]"><br>
-                Text2 :<textarea name="txt2_post" >$[txt2_post]</textarea><br>
-                <input type="submit" value="Valider">
-            </form>
-        </fieldset> 
-        
-        <fieldset>
-            <legend>Exemple formulaire POST FILE :</legend>
-            <form method="POST" enctype="multipart/form-data">
-                Fichier1 $[file_post_type]: <input type="file" name="file_post">
-                if(!=$[file_post_filename]){
-                    <br><a href="$[file_post_filename]">Télécharger</a>
-                }
-                <br>
-                Fichier2 $[file2_post_type]: <input type="file" name="file2_post">
-                if(!=$[file2_post_filename]){
-                    <br><a href="$[file2_post_filename]">Télécharger</a>
-                }
-                <br>
-                <input type="submit" value="Valider">
-            </form>
+            <legend>WIKI</legend>
+            <ul>
+                <li><a href="scripting.cgi">Scripting</a></li>
+                <li><a href="get.cgi">Variable GET</a></li>
+                <li><a href="post.cgi">Variable POST</a></li>
+                <li><a href="if.cgi">Condition IF</a></li>
+            </ul>
         </fieldset>
         
-        <fieldset>
-            <legend>Exemple formulaire GET :</legend>
-            <form method="GET">
-                Text1 :<input type="text" name="txt_get" value="$[txt_get]"><br>
-                Text2 :<input type="text" name="txt2_get" value="$[txt2_get]"><br>
-                <input type="submit" value="Valider">
-            </form>
-        </fieldset>
+        include(/home/behuman/Documents/Développements/C/LeeWee/http/www/get.cgi)
         
-        <fieldset>
-            <strong>IP :</strong><br>
-            $[ipa]
-            <br><br>
-            
-            <strong>IFCONFIG :</strong><br>
-            $[ifconfig]<br><br>
-            
-            $[ls]
-            <br><br>
-            $[env]
-            <br><br>
-            <strong>Variable d'environnement 'QUERY_STRING' :</strong><br>
-            $[QUERY_STRING]
-            <br><br>
-            
-            #modification de la variable $ls
-            $ls=<?echo "modification de la variable \$ls<br><br>"?>
-            $[ls]
-            
-            #bascule change la valeur de la variable $b pour tester la condition
-            $a=1
-            $b=2
-            $c=4
-
-            <br>condition: $a=$[a] avec $b=$[b]
-            if ($[a]==$[b])      {
-                <br><strong>condition 1 [OK] Line 1</strong><br><br>
-                if($[a]!=$[b]){
-                    <br><strong>condition 2 [NO] Line 1</strong>
-                    <br><strong>condition 2 [NO] Line 2</strong><br><br>
-                }else{
-                    <br><strong>condition 2 [OK] Line 1</strong><br>
-                    if($[a]==1){
-                        <br><strong>condition 3 [OK] Line 1</strong>
-                        <br><strong>condition 3 [OK] Line 2</strong><br>
-                        $ls=RE-modification de la variable $ls<br><br>
-                        $[ls]
-                    }else{
-                        <br><strong>condition 3 [NO] Line 1</strong>
-                        <br><strong>condition 3 [NO] Line 2</strong><br><br>
-                    }
-                    <br><strong>condition 2 [OK] Line 2</strong><br><br>
-                }
-                <br><strong>condition 1 [OK] Line 2</strong><br><br>
-                
-                <br>condition: 1 avec $b=$[b]
-                if(1==$[b]){
-                    <br><strong>sub condition 1 [OK] Line 3</strong><br><br>
-                }else{
-                    <br><strong>sub condition 1 [NO] Line 3</strong><br><br>
-                }
-                
-            }    else {
-                <br>condition: $c=$[c] avec 4
-                if($[c]==4)     {
-                    <br><strong>sub condition 1 [OK] Line 2-1</strong><br><br>
-                }else{
-                    <br><strong>sub condition 1 [NO] Line 2-2</strong><br><br>
-                }
-            }
-            <br>
-            $[python1]
-        </fieldset>
+        :get
+        #include(if.cgi)
+        if ($[test1]!=3){
+            <br>variable $[test1]</br>
+            $test1=<?echo -n "$(($[test1]+1))" ?>
+            ->get
+        } else {
+            <br>Fin variable $[test1]</br>
+            include(/home/behuman/Documents/Développements/C/LeeWee/http/www/if.cgi)
+        }
     </body>
 </html>
-

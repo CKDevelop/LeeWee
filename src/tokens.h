@@ -25,3 +25,19 @@ const char TOKEN_ELSE_2[]="^\\}\\ *else\\ *\\{";
 const char TOKEN_ELSE_3[]="^\\}else\\ *\\{";
 const char TOKEN_ELSE_4[]="^\\}\\ *else\\{";
 const char TOKEN_IF_ELSE_END_1[]="^\\}"; 
+
+/*definitions while*/
+const char TOKEN_WHILE_1[]="^while\\(.*\\)\\{";
+const char TOKEN_WHILE_2[]="^while\\ *\\(.*\\)\\ *\\{";
+const char TOKEN_WHILE_3[]="^while\\(.*\\)\\ *\\{";
+const char TOKEN_WHILE_4[]="^while\\ *\\(.*\\)\\{";
+
+/*definitions marker*/
+const char TOKEN_MARKER_SET[]="^:.*";
+const char TOKEN_MARKER_GET[]="^->.*";
+
+/*definitions function*/
+const char TOKEN_INCLUDE_1[]="^include\\(.*\\)";
+const char TOKEN_INCLUDE_2[]="^include\\ *\\(.*\\)";
+const char TOKEN_GOTO_1[]="^goto\\(.*\\)";
+const char TOKEN_GOTO_2[]="^goto\\ *\\(.*\\)";
