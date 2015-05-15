@@ -6,7 +6,6 @@
         <input type="submit" value="Valider">
     </form>
 </fieldset> 
-        
 <fieldset>
     <legend>Exemple formulaire POST FILE :</legend>
     <form method="POST" enctype="multipart/form-data">

@@ -6,6 +6,9 @@
     $c=4
 
     <br>condition: $a=$[a] avec $b=$[b]
+    if ($[a]!=$[c]){
+    <br>a!=c Pas égale<br>
+    }
     if ($[a]==$[b]){
         <br><strong>condition 1 [OK] Line 1</strong><br><br>
         if($[a]!=$[b]){

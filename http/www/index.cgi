@@ -10,6 +10,7 @@ $test1=0
         <title >$[titlePerl] </title>
     </head>
     <body>
+        éèà
         <fieldset>
             <legend>WIKI</legend>
             <ul>
@@ -20,17 +21,17 @@ $test1=0
             </ul>
         </fieldset>
         
-        include(/home/behuman/Documents/Développements/C/LeeWee/http/www/get.cgi)
         
+        include(post.cgi)
+        include(get.cgi)
         :get
-        #include(if.cgi)
         if ($[test1]!=3){
             <br>variable $[test1]</br>
             $test1=<?echo -n "$(($[test1]+1))" ?>
             ->get
         } else {
             <br>Fin variable $[test1]</br>
-            include(/home/behuman/Documents/Développements/C/LeeWee/http/www/if.cgi)
+            include(if.cgi)
         }
     </body>
 </html>

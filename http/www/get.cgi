@@ -7,4 +7,4 @@
     </form>
 </fieldset>
 $titlePOST=Exemple formulaire POST :
-include(post.cgi)
+

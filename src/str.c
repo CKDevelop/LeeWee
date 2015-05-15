@@ -39,8 +39,10 @@ char *str_join (char *, ...);
 char *str_replace (const char *, unsigned int, unsigned int, const char *);
 void str_replace_first(char * buffer, char * s, char * by);
 char *str_strip (const char *);
+unsigned short u_getc(FILE *stream, char *bytes);
 
 #endif /* not H_STRING */
+
 
 /* Convertit un nombre hexadecimal a deux "chiffres" en un caractere usuel */
 char hex2dec(char s0, char s1) {
