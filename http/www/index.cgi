@@ -6,12 +6,14 @@ $titleGET=Exemple formulaire GET :
 $titlePOST=Exemple formulaire POST :
 $titleIF=Exemple condition IF :
 $test1=0
+$test2=0
 <html>
     <head>
         <title >$[titlePerl] </title>
     </head>
     <body>
         éèà
+        :test1
         <fieldset>
             <legend>WIKI</legend>
             <ul>
@@ -22,17 +24,23 @@ $test1=0
             </ul>
         </fieldset>
         
-        
-        include(post.cgi)
-        include(get.cgi)
-        :get
-        if ($[test1]!=3){
-            <br>variable $[test1]</br>
-            $test1=<?echo -n "$(($[test1]+1))" ?>
-            ->get
-        } else {
-            <br>Fin variable $[test1]</br>
-            include(if.cgi)
+        if ($[test1]==0){
+            include(post.cgi)
+            include(get.cgi)
+            aaa<br>
+            bb
+            
+            :test2
+            if ($[test2]!=3){
+                <br>test2= $[test2]<br>
+                $test2=<?echo -n "$(($[test2]+1))" ?>
+                ->test2
+            } else {
+                <br>Fin variable test2</br>
+                include(if.cgi)
+                $test1=<?echo -n "$(($[test1]+1))" ?>
+                ->test1
+            }
         }
     </body>
 </html>

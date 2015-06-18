@@ -251,9 +251,10 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                             } else if (regex_match_const(tmp,TOKEN_IF_1)==0 || regex_match_const(tmp,TOKEN_IF_2)==0 || regex_match_const(tmp,TOKEN_IF_3)==0 || regex_match_const(tmp,TOKEN_IF_4)==0) {
                                 //condition = 1 alors condition activé
                                 // condition_etat= 1 alors condition vraie
+                                
                                 condition=1;
                                 condition_count++; 
-                                if (CONDITION[condition_count-1]==0){
+                                if (condition_count>0 && CONDITION[condition_count-1]==0){
                                     condition_etat=0;
                                     CONDITION[condition_count]=0;
                                 } else if (regex_match(tmp,"\\(.*!=.*\\)")==0){
@@ -279,7 +280,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                 }
                             } else if (regex_match_const(tmp,TOKEN_ELSE_1)==0 || regex_match_const(tmp,TOKEN_ELSE_2)==0 || regex_match_const(tmp,TOKEN_ELSE_3)==0 || regex_match_const(tmp,TOKEN_ELSE_4)==0){ 
                                 condition=1;
-                                    if (CONDITION[condition_count-1]==0){
+                                    if (condition_count>0 && CONDITION[condition_count-1]==0){
                                         CONDITION[condition_count]=0;
                                         condition_etat=0;
                                     } else if (CONDITION[condition_count]==1 ) {

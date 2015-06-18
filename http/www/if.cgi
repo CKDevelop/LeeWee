@@ -39,7 +39,7 @@
     }    else {
         <br>condition: $c=$[c] avec 4
         if($[c]==4)     {
-            <br><strong>sub condition 1 [OK] Line 2-1</strong><br><br>
+            <br><strong>sub condition 1 [NO] Line 2-1</strong><br><br>
         }else{
             <br><strong>sub condition 1 [NO] Line 2-2</strong><br><br>
         }
