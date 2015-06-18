@@ -3,6 +3,7 @@
 $title=Welcome
 $titlePerl= <?perl -e "print '$[title] in LeeWee Script'"?>
 $titleGET=Exemple formulaire GET :
+$titlePOST=Exemple formulaire POST :
 $titleIF=Exemple condition IF :
 $test1=0
 <html>

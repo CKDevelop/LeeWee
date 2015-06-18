@@ -158,7 +158,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
     if (SCRIPT) {
         char c;
         int i;
-        char *tmp = (char *)malloc(sizeof(char) * LG_MAX);
+        //char *tmp = (char *)malloc(sizeof(char) * LG_MAX);
 
         char *ligne_courante = (char *)malloc (sizeof(char) * LG_MAX);
         //char *ligne_courante = (char*)calloc(U_MAX_BYTES + 1, sizeof(char)); 
@@ -166,7 +166,9 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         int ctmp=0;
         int multiline=0;
         int pstr=-1;
+        
         char *tmp_tmp = (char *)malloc(sizeof(char) * LG_MAX);
+        char *tmp = (char *)malloc(sizeof(char) * LG_MAX);
         char *tmp_tmp_tmp = (char *)malloc(sizeof(char) * LG_MAX);
         int display_var=0;
         char *var_name=(char *)malloc (sizeof (char) * LG_MAX);
@@ -182,11 +184,10 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         //while(u_getc(SCRIPT, ligne_courante)) {
          //if (ligne_courante==NULL) break;
         while(fgets(ligne_courante, LG_MAX, SCRIPT) != NULL) {
+            if (multiline==0) memset (tmp, 0, LG_MAX);
             for(i=0;i<=strlen(ligne_courante);i++) {
                 //sprintf(&c,"%02X",  ligne_courante[i]);
-               
                 c=ligne_courante[i];
-                //printf("-%02X\n", ligne_courante[i]);
                 switch(c) {
                     case '\n': 
                         if (display_var<2) display_var=0;
@@ -303,12 +304,13 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     }
                             } else if (regex_match_const(tmp,TOKEN_INCLUDE_1)==0 || regex_match_const(tmp,TOKEN_INCLUDE_2)==0){ //function include
                                 if ((condition==1 && condition_etat > 0) || (condition==0)) {
-                                    tmp_tmp_tmp=regex(tmp,"\\((.*)\\)");
-                                    tmp_tmp_tmp=str_replace(tmp_tmp_tmp,0,1,"");
-                                    tmp_tmp_tmp=str_replace(tmp_tmp_tmp,strlen(tmp_tmp_tmp)-1,1,"");
-                                    if (pos_html2==0) parseScript(fopen(tmp_tmp_tmp,"r"), 0);
-                                    else parseScript(fopen(tmp_tmp_tmp,"r"), 1);
-                                    
+                                    char *tmp_include = (char *)malloc(sizeof(char) * LG_MAX);
+                                    tmp_include=regex(tmp,"\\((.*)\\)");
+                                    tmp_include=str_replace(tmp_include,0,1,"");
+                                    tmp_include=str_replace(tmp_include,strlen(tmp_include)-1,1,"");
+                                    if (pos_html2==0) parseScript(fopen(tmp_include,"r"), 0);
+                                    else parseScript(fopen(tmp_include,"r"), 1);
+                                    free(tmp_include);
                                 }
                             } else if (regex_match_const(tmp,TOKEN_MARKER_SET)==0){ //Ajout d'un marker
                                 tmp_tmp=regex(tmp,"^:(.*)");
@@ -341,12 +343,12 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     printf("Content-type: text/html;charset=utf-8\n\n");
                                     pos_html2=1;
                                 }
-                                if (condition==1 && condition_etat > 0) printf("%s\n",tmp);
-                                else if (condition==0) printf("%s\n",tmp);
+                                    if (condition==1 && condition_etat > 0) printf("%s\n",tmp);
+                                    else if (condition==0) printf("%s\n",tmp);
                             }
                         }
                         
-                        if (multiline==0) memset(tmp, 0, LG_MAX);
+                        //if (multiline==0) memset(tmp, 0, LG_MAX);
                         break;
                     case '$':
                         display_var=1;
@@ -380,13 +382,14 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                         } else if (i==0) {
                             if (c==' ' && multiline==0) { ctmp=1; continue; }
                         } else {
-                            if (c==' ' && ctmp==1 && multiline==0) continue;
+                            if (c==' ' && ctmp==1 && multiline==0) {  continue;}
                             ctmp=0;
                         }
                         strncat(tmp, &c, 1);
                         break;
                 }
             }
+            
         }
         fclose(SCRIPT);
         free(tmp);
