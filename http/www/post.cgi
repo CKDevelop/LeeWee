@@ -1,3 +1,4 @@
+<h2>post.cgi</h2>
 <fieldset>
     <legend>$[titlePOST]</legend>
     <form method="POST">

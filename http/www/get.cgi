@@ -1,3 +1,4 @@
+<h2>get.cgi</h2>
 <fieldset>
 <legend>$[titleGET]</legend>
         <form method="GET">

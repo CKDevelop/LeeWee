@@ -71,6 +71,15 @@ void dbgint(int msg) {
     exit(0);
 }
 
+int str2int(char *msg) {
+    int OUT=0;
+    int ind;
+    for (ind = 0; ind < strlen(msg); ind++) {
+        OUT=OUT+(int)msg[ind];
+    }
+    return OUT;
+}
+
 int uploadFile() {
     int content_length;
     char *ligne_courante_tmp = (char *)malloc (sizeof(char) * LG_MAX);
@@ -181,12 +190,9 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         int condition_etat=0;
         char **tableau_value = NULL;
         int CONDITION[LG_MAX];
-        //while(u_getc(SCRIPT, ligne_courante)) {
-         //if (ligne_courante==NULL) break;
         while(fgets(ligne_courante, LG_MAX, SCRIPT) != NULL) {
             if (multiline==0) memset (tmp, 0, LG_MAX);
             for(i=0;i<=strlen(ligne_courante);i++) {
-                //sprintf(&c,"%02X",  ligne_courante[i]);
                 c=ligne_courante[i];
                 switch(c) {
                     case '\n': 
@@ -257,7 +263,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                 if (condition_count>0 && CONDITION[condition_count-1]==0){
                                     condition_etat=0;
                                     CONDITION[condition_count]=0;
-                                } else if (regex_match(tmp,"\\(.*!=.*\\)")==0){
+                                } else if (regex_match(tmp,"\\(.*!=.*\\)")==0){ //si condition de type pas égal
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*!=)"),strlen(regex(tmp,"(\\(.*!=)"))-2,2,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(!=.*\\))"),strlen(regex(tmp,"(!=.*\\))"))-1,1,""),0,2,"");
                                     if (strcmp(var_name, var_value)==0) {
@@ -267,10 +273,50 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                             condition_etat=1;
                                             CONDITION[condition_count]=1;
                                     }
-                                } else if (regex_match(tmp,"\\(.*==.*\\)")==0){
+                                } else if (regex_match(tmp,"\\(.*==.*\\)")==0){ //si condition de type égal
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*==)"),strlen(regex(tmp,"(\\(.*==)"))-2,2,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(==.*\\))"),strlen(regex(tmp,"(==.*\\))"))-1,1,""),0,2,"");
                                     if (strcmp(var_name, var_value)==0) {
+                                            condition_etat=1;
+                                            CONDITION[condition_count]=1;
+                                    } else {
+                                            condition_etat=0;
+                                            CONDITION[condition_count]=0;
+                                    }
+                                } else if (regex_match(tmp,"\\(.*>=.*\\)")==0){ //si condition de type plus grand ou égal
+                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*>=)"),strlen(regex(tmp,"(\\(.*>=)"))-2,2,""),0,1,"");
+                                    var_value=str_replace(str_replace(regex(tmp,"(>=.*\\))"),strlen(regex(tmp,"(>=.*\\))"))-1,1,""),0,2,"");
+                                    if (str2int(var_name)>=str2int(var_value)) {
+                                            condition_etat=1;
+                                            CONDITION[condition_count]=1;
+                                    } else {
+                                            condition_etat=0;
+                                            CONDITION[condition_count]=0;
+                                    }
+                                } else if (regex_match(tmp,"\\(.*>.*\\)")==0){ //si condition de type plus grand
+                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*>)"),strlen(regex(tmp,"(\\(.*>)"))-1,1,""),0,1,"");
+                                    var_value=str_replace(str_replace(regex(tmp,"(>.*\\))"),strlen(regex(tmp,"(>.*\\))"))-1,1,""),0,1,"");
+                                    if (str2int(var_name)>str2int(var_value)) {
+                                            condition_etat=1;
+                                            CONDITION[condition_count]=1;
+                                    } else {
+                                            condition_etat=0;
+                                            CONDITION[condition_count]=0;
+                                    }
+                                } else if (regex_match(tmp,"\\(.*<=.*\\)")==0){ //si condition de type plus petit ou égal
+                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*<=)"),strlen(regex(tmp,"(\\(.*<=)"))-2,2,""),0,1,"");
+                                    var_value=str_replace(str_replace(regex(tmp,"(<=.*\\))"),strlen(regex(tmp,"(<=.*\\))"))-1,1,""),0,2,"");
+                                    if (str2int(var_name)<=str2int(var_value)) {
+                                            condition_etat=1;
+                                            CONDITION[condition_count]=1;
+                                    } else {
+                                            condition_etat=0;
+                                            CONDITION[condition_count]=0;
+                                    }
+                                } else if (regex_match(tmp,"\\(.*<.*\\)")==0){ //si condition de type plus petit
+                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*<)"),strlen(regex(tmp,"(\\(.*<)"))-1,1,""),0,1,"");
+                                    var_value=str_replace(str_replace(regex(tmp,"(<.*\\))"),strlen(regex(tmp,"(<.*\\))"))-1,1,""),0,1,"");
+                                    if (str2int(var_name)<str2int(var_value)) {
                                             condition_etat=1;
                                             CONDITION[condition_count]=1;
                                     } else {
@@ -328,16 +374,6 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     condition_etat = 0;
                                     condition_count=-1;
                                     fseek( SCRIPT, afficherMarker(mes_markers, var_name), SEEK_SET );
-                                }
-                            } else if (regex_match_const(tmp,TOKEN_GOTO_1)==0 || regex_match_const(tmp,TOKEN_GOTO_2)==0){ //aller jusqu'au marker
-                                if ((condition==1 && condition_etat > 0) || (condition==0)) {
-                                    tmp_tmp=regex(tmp,"\\((.*)\\)");
-                                    tmp_tmp_tmp=str_replace(tmp_tmp,0,1,"");
-                                    tmp_tmp_tmp=str_replace(tmp_tmp_tmp,strlen(tmp_tmp_tmp)-1,1,"");
-                                    condition=0;
-                                    condition_etat = 0;
-                                    condition_count=-1;
-                                    fseek( SCRIPT, atol(tmp_tmp_tmp), SEEK_SET );
                                 }
                             } else {
                                 if (pos_html2<=0) {

@@ -1,4 +1,4 @@
-#! ./../../lw
+<h2>scripting.cgi</h2>
 
 $ii=aa
 $ipa=<?/sbin/ifconfig | grep 'inet adr' | cut -d: -f2 | cut -d' ' -f1?>
@@ -20,15 +20,8 @@ else:
     print(\"<strong>NO</strong>\")"
 ?>
 
-$titlePerl= <?perl -e "print '$[title] in LeeWee'"?>
 $mot=welcome
 $\$[mot]=$[title] in LeeWee Script
-
-<html>
-    <head>
-        <title >$[titlePerl] </title>
-    </head>
-    <body>
         <h1>$[welcome]</h1>
         
         <fieldset>
@@ -54,6 +47,4 @@ $\$[mot]=$[title] in LeeWee Script
             <br>
             $[python1]
         </fieldset>
-    </body>
-</html>
 

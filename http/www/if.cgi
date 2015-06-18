@@ -1,3 +1,4 @@
+<h2>if.cgi</h2>
 <fieldset>
     <legend>$[titleIF]</legend>
     #bascule change la valeur de la variable $b pour tester la condition
@@ -46,4 +47,34 @@
     }
     <br>
 </fieldset>
+
+$test1=0
+$test2=0
+if ($[test1]==0){
+            :test
+            if ($[test2]!=3){
+                <br>test2= $[test2]<br>
+                $test2=<?echo -n "$(($[test2]+1))" ?>
+                ->test
+            } else {
+                <br>Fin variable test2</br>
+                include(if.cgi)
+                $test1=<?echo -n "$(($[test1]+1))" ?>
+            }
+        }
+        if ($[test2]>$[test1]){
+            <p>$[test2] est plus grand que $[test1]</p>
+        }
+        $test1=3
+        if ($[test2]>=$[test1]){
+            <p>$[test2] est plus grand ou égal à $[test1]</p>
+        }
+        $test1=0
+        if ($[test1]<$[test2]){
+            <p>$[test1] est plus petit que $[test2]</p>
+        }
+        $test2=0
+        if ($[test1]<=$[test2]){
+            <p>$[test1] est plus petit ou égal à $[test2]</p>
+        }
 
