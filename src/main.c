@@ -288,7 +288,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     mes_variables=ajouterVariable(mes_variables, var_name, var_value);
                                     
                                     sprintf(tmp_tmp_tmp, "$%s", var_name);
-                                    sprintf(tmp_tmp, "tmp%s", afficherVariable(mes_variables, "LW_SESSION"));
+                                    sprintf(tmp_tmp, "%s_tmp", afficherVariable(mes_variables, "LW_SESSION"));
                                     
                                     sessionfile = fopen(afficherVariable(mes_variables, "LW_SESSION"), "r");
                                     sessionfiletmp = fopen(tmp_tmp, "w+");
@@ -501,6 +501,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
 int main(int argc, char *argv[], char *envp[]) {
     char* REQUESTMETHOD;
     char *POST ;
+    char *tmp = (char *)malloc(sizeof(char) * LG_MAX);
     int fileup=0;
     REQUESTMETHOD=getenv("REQUEST_METHOD");
     char* GET;
@@ -557,19 +558,29 @@ int main(int argc, char *argv[], char *envp[]) {
     if (tms.tv_nsec % 1000 >= 500) { ++timestamp; }
     /* TIMESTAMP */
     
+/*    mkdir("sessions/", 0777);*/
+/*    FILE *sessiondir = fopen("sessions/index.html", "w");*/
+/*    fclose(sessiondir);*/
     if (strcmp(afficherVariable(mes_variables, "LW_SESSION"), "")!=0) {
         if (parseScript(fopen(afficherVariable(mes_variables, "LW_SESSION"),"r"), 0)!=0){
-            printf("Set-Cookie: LW_SESSION=_%s; expires=%u\n", afficherVariable(mes_variables, "LW_SESSION"),(unsigned)time(NULL)+900);
-            FILE *sessionfile = fopen(afficherVariable(mes_variables, "LW_SESSION"), "wb");
+            printf("Set-Cookie: LW_SESSION=../%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
+            char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
+            sprintf(session_name, "../%"PRId64"", timestamp);
+            mes_variables=ajouterVariable(mes_variables, "LW_SESSION", session_name);
+            FILE *sessionfile = fopen(session_name, "w");
             fclose(sessionfile);
+        } else {
+            printf("Set-Cookie: LW_SESSION=%s; expires=%u\n", afficherVariable(mes_variables, "LW_SESSION"),(unsigned)time(NULL)+900);
         }
     } else {
-        printf("Set-Cookie: LW_SESSION=_%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
+        printf("Set-Cookie: LW_SESSION=../%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
         char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
-        sprintf(session_name, "%"PRId64"", timestamp);
-        FILE *sessionfile = fopen(session_name, "wb");
+        sprintf(session_name, "../%"PRId64"", timestamp);
+        mes_variables=ajouterVariable(mes_variables, "LW_SESSION", session_name);
+        FILE *sessionfile = fopen(session_name, "w");
         fclose(sessionfile);
     }
+    
     
     if (parseScript(fopen(argv[1],"r"), 0)==0){
         libererListeVariables(mes_variables);
