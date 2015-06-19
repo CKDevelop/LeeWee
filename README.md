@@ -4,7 +4,7 @@ by David Lhoumaud
 
 craft@ckdevelop.org
 
-[This link](http://ckdevelop.org/index.php?article42/leewee-petit-language-interprete-en-c) www.ckdevelop.org
+[www.ckdevelop.org](http://ckdevelop.org/index.php?article42/leewee-petit-language-interprete-en-c)
 
 ![Logo LeeWee](https://github.com/davidlhoumaud/LeeWee/blob/master/thumbnail.jpg "Logo LeeWee")
 
