@@ -40,6 +40,10 @@ WIKI
 ```
 $my_variable=hello world !!
 ```
+#assign a variable session: 
+```
+s$my_variable=hello world !!
+```
 
 #variable a display:
 ```
