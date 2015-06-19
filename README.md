@@ -93,6 +93,16 @@ done?>
 ```
 
 #condition IF/ELSE
+##Operator
+Operator  | Description
+----------| -------------
+==        | equal
+!=        | not equal
+<         | less than
+<=        | less than or equal
+>         | bigger than
+>=        | greater or equal
+
 ##simple IF
 ```
 if ($[my_variable]==) {
@@ -108,14 +118,12 @@ if ($[my_variable]!=) {
     variable empty
 }
 ```
-
-##Operator
-Operator  | Description
-------------- | -------------
-==  | equal
-!=  | not equal
-<  | equal
-<=  | not equal
->  | equal
->=  | not equal
-
+#Marker
+##add a marker
+```
+:marker_name
+```
+##go to a marker
+```
+->marker_name
+```
