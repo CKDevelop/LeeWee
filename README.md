@@ -37,67 +37,55 @@ WIKI
 ====
 
 #assign a variable: 
-$my_variable=hello world !!
+```$my_variable=hello world !!```
 
 #variable a display:
-$[my_variable]
+```$[my_variable]```
 
 #naming a variable with another variable:
-$namevar=my_variable
-
-$\$[namevar]=hello world !!
+```$namevar=my_variable
+$\$[namevar]=hello world !!```
 
 #display this variable:
-$[my_variable]
+```$[my_variable]```
 
 #execute a command:
-&lsaquo;?ls?&rsaquo;
+```&lsaquo;?ls?&rsaquo;```
 #execute a command and store it in a variable:
-$my_variable=&lsaquo;?ls?&rsaquo;
+```$my_variable=&lsaquo;?ls?&rsaquo;```
 
 #execute and store the output of a python script or another language:
 ##python:
-$python_example= &lsaquo;?python -c "print(\"$[my_variable], it is a python script !\")
-
+```$python_example= &lsaquo;?python -c "print(\"$[my_variable], it is a python script !\")
 a=1
-
 b=2
-
 if a==2:
-
     print(\"OK\")
-
 else:
-
     print(\"NO\")"
-?&rsaquo;
+?&rsaquo;```
 
 ##php:
-$php_example=&lsaquo;?php -r "phpinfo();"?&rsaquo;
+```$php_example=&lsaquo;?php -r "phpinfo();"?&rsaquo;```
 
 #echo command Shell/Bash
-$echo_example= &lsaquo;?echo -n "&lsaquo;strong&rsaquo;&lsaquo;strong&rsaquo;LS : &lsaquo;/strong&rsaquo;liste des fichiers et r&eacute;pertoires :&lsaquo;/strong&rsaquo;&lsaquo;br&rsaquo;"
+```$echo_example= &lsaquo;?echo -n "&lsaquo;strong&rsaquo;&lsaquo;strong&rsaquo;LS : &lsaquo;/strong&rsaquo;liste des fichiers et r&eacute;pertoires :&lsaquo;/strong&rsaquo;&lsaquo;br&rsaquo;"
 ls | while read line; do
-
     echo -n "-$line<br>"
-
-done?&rsaquo;
+done?&rsaquo;```
 
 #condition IF/ELSE
 ##simple IF
-if ($[my_variable]==) {
-
+```if ($[my_variable]==) {
     variable empty
-
-}
+}```
 
 ##IF and ELSE
-if ($[my_variable]!=) {
-
+```if ($[my_variable]!=) {
     variable not empty
-
 } else {
-
     variable empty
+}```
 
-}
+##Operator
+
