@@ -47,4 +47,6 @@ $\$[mot]=$[title] in LeeWee Script
             <br>
             $[python1]
         </fieldset>
-
+<h2>Example PHP</h2>
+$php_example=<?php -r "phpinfo();"?>
+$[php_example]
