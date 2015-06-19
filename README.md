@@ -37,7 +37,9 @@ WIKI
 ====
 
 #assign a variable: 
-```$my_variable=hello world !!```
+```
+$my_variable=hello world !!
+```
 
 #variable a display:
 ```$[my_variable]```
