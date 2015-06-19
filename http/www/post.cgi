@@ -1,7 +1,8 @@
 <h2>post.cgi</h2>
 <fieldset>
     <legend>$[titlePOST]</legend>
-    <form method="POST">
+    <form method="POST" >
+        <input type="hidden" name="page" value="post">
         Text1 :<input type="text" name="txt_post" value="$[txt_post]"><br>
         Text2 :<textarea name="txt2_post" >$[txt2_post]</textarea><br>
         <input type="submit" value="Valider">
@@ -10,6 +11,7 @@
 <fieldset>
     <legend>Exemple formulaire POST FILE :</legend>
     <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="page" value="post">
         Fichier1 $[file_post_type]: <input type="file" name="file_post">
         if(!=$[file_post_filename]){
             <br><img src="$[file_post_filename]" width="200px">
