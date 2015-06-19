@@ -59,37 +59,37 @@ $[my_variable]
 
 #execute a command:
 ```
-&lsaquo;?ls?&rsaquo;
+<?ls?>
 ```
 #execute a command and store it in a variable:
 ```
-$my_variable=&lsaquo;?ls?&rsaquo;
+$my_variable=<?ls?>
 ```
 
 #execute and store the output of a python script or another language:
 ##python:
 ```
-$python_example= &lsaquo;?python -c "print(\"$[my_variable], it is a python script !\")
+$python_example= <?python -c "print(\"$[my_variable], it is a python script !\")
 a=1
 b=2
 if a==2:
     print(\"OK\")
 else:
     print(\"NO\")"
-?&rsaquo;
+?>
 ```
 
 ##php:
 ```
-$php_example=&lsaquo;?php -r "phpinfo();"?&rsaquo;
+$php_example=<?php -r "phpinfo();"?>
 ```
 
 #echo command Shell/Bash
 ```
-$echo_example= &lsaquo;?echo -n "&lsaquo;strong&rsaquo;&lsaquo;strong&rsaquo;LS : &lsaquo;/strong&rsaquo;liste des fichiers et r&eacute;pertoires :&lsaquo;/strong&rsaquo;&lsaquo;br&rsaquo;"
+$echo_example= <?echo -n "&lsaquo;strong&rsaquo;&lsaquo;strong&rsaquo;LS : &lsaquo;/strong&rsaquo;liste des fichiers et r&eacute;pertoires :&lsaquo;/strong&rsaquo;&lsaquo;br&rsaquo;"
 ls | while read line; do
     echo -n "-$line<br>"
-done?&rsaquo;
+done?>
 ```
 
 #condition IF/ELSE
@@ -110,4 +110,12 @@ if ($[my_variable]!=) {
 ```
 
 ##Operator
+Operator  | Description
+------------- | -------------
+==  | equal
+!=  | not equal
+<  | equal
+<=  | not equal
+>  | equal
+>=  | not equal
 
