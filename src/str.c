@@ -28,8 +28,6 @@
 
 char hex2dec(char, char);
 void urldecode (char *);
-int ParseCGIString(char *,char *);
-void BeforePrintingCGIString(char *);
 char *str_tolower (const char *);
 char *str_toupper (const char *);
 int str_istr (const char *, const char *);
@@ -80,71 +78,6 @@ void urldecode(char *src)
     src[iDest]=0; 
 }
 
-/* Decoupe la chaine CGI en ses differents arguments */
-int ParseCGIString(char *pszCGIString,char *pszResult) {
-    char pszTemp[LG_MAX], *pszString, *pszPointer;
-    int iLength;
-
-    iLength=strlen(pszCGIString);
-    if(iLength>0 && iLength<LG_MAX){
-        pszString=pszCGIString;
-        pszPointer=pszTemp;
-        if(*pszString!=0){
-            if(*pszString=='=' && *(pszString+1)==0){
-                pszString++;
-                *pszResult=0;
-            }
-            while(*pszString!='=' && *pszString!='&' && *pszString!=0) *(pszPointer++)=*(pszString++);
-            if(*pszString=='=' || *pszString=='&' || (*pszString==0 && pszPointer!=pszTemp)){
-                *pszPointer=0;
-                pszPointer=pszTemp;
-                if(*pszString && !(*pszString=='=' && *(pszString+1)==0)) pszString++;
-                urldecode(pszTemp);
-                strcpy(pszResult,pszTemp);
-            }
-        }
-        strcpy(pszCGIString,pszString);
-        return 1;
-    }else{
-        if(iLength>0) printf("Erreur : taille de chaine %d superieure a la longueur max %d. \n",iLength,LG_MAX);
-        return 0;
-    }
-}
-
-/* Remplace les '<' et '>' de la chaine en vue de l'affichage dans un browser */
-void BeforePrintingCGIString(char *pszString){
-    char pszTemp[LG_MAX];
-    int iSrc, iDest;
-
-    iSrc=0;
-    iDest=0;
-    while(pszString[iSrc]!=0 && iDest<LG_MAX){
-        while(pszString[iSrc]!='<' && pszString[iSrc]!='>' && pszString[iSrc]!=0 && iDest<LG_MAX)
-            pszTemp[iDest++]=pszString[iSrc++];
-
-        if(pszString[iSrc]=='<'){
-            iSrc++;
-            if(iDest<(LG_MAX-5)){
-                pszTemp[iDest++]='&';
-                pszTemp[iDest++]='#';
-                pszTemp[iDest++]='6';
-                pszTemp[iDest++]='0';
-            }
-        }
-        if(pszString[iSrc]=='>'){
-            iSrc++;
-            if (iDest<(LG_MAX-5)) {
-                pszTemp[iDest++]='&';
-                pszTemp[iDest++]='#';
-                pszTemp[iDest++]='6';
-                pszTemp[iDest++]='2';
-            }
-        }
-    }
-    pszTemp[iDest]=0;
-    strcpy(pszString,pszTemp);
-}
-
 char *str_tolower (const char *ct)
 {
   char *s = NULL;
@@ -185,6 +118,14 @@ char *str_toupper (const char *ct)
     }
   }
   return s;
+}
+
+int str_pos(char *haystack, char *needle)
+{
+   char *p = strstr(haystack, needle);
+   if (p)
+      return p - haystack;
+   return -1;
 }
 
 int str_istr (const char *cs, const char *ct)

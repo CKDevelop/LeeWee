@@ -28,5 +28,14 @@ $titleIF=Exemple condition IF :
             }
         }
         
+        if($[varsession3]!=) {
+        <p>variable de session <b>varsession3</b> = $[varsession3]</p>
+        s$varsession4=salut le monde4 format
+        } else {
+            s$varsession1=salut le monde1
+            s$varsession2=salut le monde2
+            s$varsession3=salut le monde3
+            s$varsession4=salut le monde4
+        }
     </body>
 </html>
