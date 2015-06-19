@@ -6,7 +6,7 @@ craft@ckdevelop.org
 
 www.ckdevelop.org
 
-![Logo LeeWee](https://github.com/davidlhoumaud/LeeWee/blob/master/logo.png "Logo LeeWee")
+![Logo LeeWee](https://github.com/davidlhoumaud/LeeWee/blob/master/thumbnail.jpg "Logo LeeWee")
 
 ###An example script is available in the directory :
 http/www/index.cgi 
