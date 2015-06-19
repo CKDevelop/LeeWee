@@ -92,7 +92,7 @@ ls | while read line; do
 done?>
 ```
 
-#condition IF/ELSE
+#CONDITION IF/ELSE
 ##Operator
 Operator  | Description
 ----------| -------------
@@ -118,7 +118,7 @@ if ($[my_variable]!=) {
     variable empty
 }
 ```
-#Marker
+#MARKER
 ##add a marker
 ```
 :marker_name
@@ -126,4 +126,9 @@ if ($[my_variable]!=) {
 ##go to a marker
 ```
 ->marker_name
+```
+
+#INCLUDE A FILE
+```
+include(filename.cgi)
 ```
