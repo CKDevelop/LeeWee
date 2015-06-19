@@ -60,13 +60,11 @@ void getVarsRequest(char* VARSQUERY) {
     }
 }
 void dbg(char *msg) {
-    printf("Content-type: text/plain;charset=utf-8\n\n");
     printf("%s", msg);
     exit(0);
 }
 
 void dbgint(int msg) {
-    printf("Content-type: text/plain;charset=utf-8\n\n");
     printf("%d", msg);
     exit(0);
 }
@@ -370,9 +368,10 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                 if ((condition==1 && condition_etat > 0) || (condition==0)) {
                                     tmp_tmp=regex(tmp,"^->(.*)");
                                     var_name=str_replace(tmp_tmp,0,2,"");
+                                    printf("[DBG] %s\n<br>",var_name);
                                     condition=0;
                                     condition_etat = 0;
-                                    condition_count=-1;
+                                    //condition_count=0;
                                     fseek( SCRIPT, afficherMarker(mes_markers, var_name), SEEK_SET );
                                 }
                             } else {

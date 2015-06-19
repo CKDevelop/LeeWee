@@ -15,16 +15,16 @@ $titleIF=Exemple condition IF :
         <fieldset>
             <legend>WIKI</legend>
             <ul>
-                <li><a href="?page=scripting.cgi">Scripting</a></li>
-                <li><a href="?page=get.cgi">Variable GET</a></li>
-                <li><a href="?page=post.cgi">Variable POST</a></li>
-                <li><a href="?page=if.cgi">Condition IF</a></li>
+                <li><a href="?page=scripting">Scripting</a></li>
+                <li><a href="?page=get">Variable GET</a></li>
+                <li><a href="?page=post">Variable POST</a></li>
+                <li><a href="?page=if">Condition IF</a></li>
             </ul>
         </fieldset>
         
         if ($[page]!=) {
             if ($[page]!=home) {
-            include($[page])
+            include($[page].cgi)
             }
         }
         

@@ -48,9 +48,9 @@
     <br>
 </fieldset>
 
-$test1=0
-$test2=0
-if ($[test1]==0){
+        $test1=0
+        $test2=0
+        if ($[test1]==0){
             :test
             if ($[test2]!=3){
                 <br>test2= $[test2]<br>
@@ -58,14 +58,12 @@ if ($[test1]==0){
                 ->test
             } else {
                 <br>Fin variable test2</br>
-                include(if.cgi)
-                $test1=<?echo -n "$(($[test1]+1))" ?>
             }
         }
         if ($[test2]>$[test1]){
             <p>$[test2] est plus grand que $[test1]</p>
         }
-        $test1=3
+        $test1=$[test2]
         if ($[test2]>=$[test1]){
             <p>$[test2] est plus grand ou égal à $[test1]</p>
         }
@@ -73,7 +71,7 @@ if ($[test1]==0){
         if ($[test1]<$[test2]){
             <p>$[test1] est plus petit que $[test2]</p>
         }
-        $test2=0
+        $test2=$[test1]
         if ($[test1]<=$[test2]){
             <p>$[test1] est plus petit ou égal à $[test2]</p>
         }
