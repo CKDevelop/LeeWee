@@ -368,7 +368,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                 if ((condition==1 && condition_etat > 0) || (condition==0)) {
                                     tmp_tmp=regex(tmp,"^->(.*)");
                                     var_name=str_replace(tmp_tmp,0,2,"");
-                                    printf("[DBG] %s\n<br>",var_name);
+                                    //printf("[DBG] %s\n<br>",var_name);
                                     condition=0;
                                     condition_etat = 0;
                                     //condition_count=0;
