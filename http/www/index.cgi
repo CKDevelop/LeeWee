@@ -8,7 +8,7 @@ $titleIF=Exemple condition IF :
 
 <html>
     <head>
-        <title >$[titlePerl] </title>
+        <title>$[titlePerl]</title>
     </head>
     <body>
         <a href="index.cgi?page=home"><h1>$[titlePerl]</h1></a>
@@ -24,10 +24,9 @@ $titleIF=Exemple condition IF :
         
         if ($[page]!=) {
             if ($[page]!=home) {
-            include($[page].cgi)
+                include($[page].cgi)
             }
         }
-        
         
     </body>
 </html>

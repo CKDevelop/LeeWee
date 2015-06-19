@@ -93,6 +93,10 @@
       <match>[$]+\[[a-zA-Z_][a-zA-Z0-9_]*\]</match>
     </context>
     
+    <context id="session-variable" style-ref="type">
+      <match>[s]+[$]+\[[a-zA-Z_][a-zA-Z0-9_]*\]</match>
+    </context>
+    
     <context id="set-marker" style-ref="boolean">
       <match>[:]+[a-zA-Z0-9_]*</match>
     </context>
@@ -106,6 +110,13 @@
     </context>
     <context id="start-varvariable" style-ref="type">
       <match>[$]+\\[$]+\[[a-zA-Z_][a-zA-Z0-9_\ ]*\]*+=</match>
+    </context>
+    
+     <context id="session-start-variable" style-ref="type">
+      <match>[s]+[$]+[a-zA-Z_][a-zA-Z0-9_\ ]*+=</match>
+    </context>
+    <context id="session-start-varvariable" style-ref="type">
+      <match>[s]+[$]+\\[$]+\[[a-zA-Z_][a-zA-Z0-9_\ ]*\]*+=</match>
     </context>
 
     <context id="array-operators" style-ref="variable">
@@ -352,7 +363,10 @@
         <context ref="now-doc-string"/>
         <context ref="start-variable"/>
         <context ref="start-varvariable"/>
+        <context ref="session-start-variable"/>
+        <context ref="session-start-varvariable"/>
         <context ref="variable"/>
+        <context ref="session-variable"/>
         <context ref="set-marker"/>
         <context ref="get-marker"/>
         <context ref="array-operators"/>
@@ -377,6 +391,9 @@
         <context ref="html:html"/>
         <context ref="start-variable"/>
         <context ref="start-varvariable"/>
+        <context ref="session-start-variable"/>
+        <context ref="session-start-varvariable"/>
+        <context ref="session-variable"/>
         <context ref="set-marker"/>
         <context ref="get-marker"/>
         <context ref="variable"/>

@@ -6,6 +6,13 @@ const char TOKEN_VAR_3[]="^\\$.*=.*$";
 const char TOKEN_VAR_START_1[]="^\\$.*=\\ <\\?.*$";
 const char TOKEN_VAR_START_2[]="^\\$.*=<\\?.*$";
 const char TOKEN_VAR_END_1_2[]="\\?>$";
+/*definitions variables de session*/
+const char TOKEN_VAR_SESSION_1[]="^s\\$.*=\\ <\\?.*\\?>$";
+const char TOKEN_VAR_SESSION_2[]="^s\\$.*=<\\?.*\\?>$";
+const char TOKEN_VAR_SESSION_3[]="^s\\$.*=.*$";
+const char TOKEN_VAR_SESSION_START_1[]="^s\\$.*=\\ <\\?.*$";
+const char TOKEN_VAR_SESSION_START_2[]="^s\\$.*=<\\?.*$";
+const char TOKEN_VAR_SESSION_NAME_1[]="(^s\\$.*=)";
 /*nom variable*/
 const char TOKEN_VAR_NAME_1[]="(^\\$.*=)";
 const char TOKEN_VAR_NAME_2[]="([_[:alnum:]]+)";

@@ -6,6 +6,8 @@
 #endif
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+
 #include <regex.h>
 #include <ctype.h>
 #include <time.h>
@@ -178,6 +180,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         char *tmp = (char *)malloc(sizeof(char) * LG_MAX);
         char *tmp_tmp_tmp = (char *)malloc(sizeof(char) * LG_MAX);
         int display_var=0;
+        int display_var_session=0;
         char *var_name=(char *)malloc (sizeof (char) * LG_MAX);
         char *var_value=(char *)malloc (sizeof (char) * LG_MAX);
 
@@ -200,18 +203,36 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                             /*si la ligne vaut $var=<? cmd ?>*/
                             if ((regex_match_const(tmp,TOKEN_VAR_1)==0 || regex_match_const(tmp,TOKEN_VAR_2)==0) && (multiline==0) ){
                                 if ((condition==1 && condition_etat >0) || (condition==0)) {
-                                var_name=regex_const(regex_const(tmp,TOKEN_VAR_NAME_1),TOKEN_VAR_NAME_2);
-                                tmp_tmp=regex(tmp,"(<\\?.*\\?>$)");
-                                tmp_tmp=str_replace(tmp_tmp,0,2,"");
-                                pstr=str_istr(tmp_tmp,"?>");
-                                tmp_tmp=str_replace(tmp_tmp,pstr,2,"");
-                                var_value=shell(tmp_tmp);
-                                libererVariable(mes_variables, var_name);
-                                mes_variables=ajouterVariable(mes_variables, var_name, var_value);
+                                    var_name=regex_const(regex_const(tmp,TOKEN_VAR_NAME_1),TOKEN_VAR_NAME_2);
+                                    tmp_tmp=regex(tmp,"(<\\?.*\\?>$)");
+                                    tmp_tmp=str_replace(tmp_tmp,0,2,"");
+                                    pstr=str_istr(tmp_tmp,"?>");
+                                    tmp_tmp=str_replace(tmp_tmp,pstr,2,"");
+                                    var_value=shell(tmp_tmp);
+                                    libererVariable(mes_variables, var_name);
+                                    mes_variables=ajouterVariable(mes_variables, var_name, var_value);
                                 }
-
+                            /*si la ligne vaut s$var=<? cmd ?>*/
+                            } else if ((regex_match_const(tmp,TOKEN_VAR_SESSION_1)==0 || regex_match_const(tmp,TOKEN_VAR_SESSION_2)==0) && (multiline==0) ){
+                                if ((condition==1 && condition_etat >0) || (condition==0)) {
+                                    var_name=regex_const(regex_const(tmp,TOKEN_VAR_SESSION_NAME_1),TOKEN_VAR_NAME_2);
+                                    tmp_tmp=regex(tmp,"(<\\?.*\\?>$)");
+                                    tmp_tmp=str_replace(tmp_tmp,0,2,"");
+                                    pstr=str_istr(tmp_tmp,"?>");
+                                    tmp_tmp=str_replace(tmp_tmp,pstr,2,"");
+                                    var_value=shell(tmp_tmp);
+                                    libererVariable(mes_variables, var_name);
+                                    mes_variables=ajouterVariable(mes_variables, var_name, var_value);
+                                }
                             /*si la ligne vaut $var=<? cmd*/
                             } else if ((regex_match_const(tmp,TOKEN_VAR_START_1)==0 || regex_match_const(tmp,TOKEN_VAR_START_2)==0) && (multiline==0) && (condition_etat!=1)){
+                                tmp_tmp=regex(tmp,"(<\\?.*$)");
+                                tmp_tmp=str_replace(tmp_tmp,0,2,"");
+                                //printf("%s\033[0m\n",tmp_tmp);
+                                strncat(tmp, "\n", 1);
+                                multiline=1;
+                            /*si la ligne vaut s$var=<? cmd*/
+                            } else if ((regex_match_const(tmp,TOKEN_VAR_SESSION_START_1)==0 || regex_match_const(tmp,TOKEN_VAR_SESSION_START_2)==0) && (multiline==0) && (condition_etat!=1)){
                                 tmp_tmp=regex(tmp,"(<\\?.*$)");
                                 tmp_tmp=str_replace(tmp_tmp,0,2,"");
                                 //printf("%s\033[0m\n",tmp_tmp);
@@ -265,61 +286,61 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*!=)"),strlen(regex(tmp,"(\\(.*!=)"))-2,2,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(!=.*\\))"),strlen(regex(tmp,"(!=.*\\))"))-1,1,""),0,2,"");
                                     if (strcmp(var_name, var_value)==0) {
-                                            condition_etat=0;
-                                            CONDITION[condition_count]=0;
+                                        condition_etat=0;
+                                        CONDITION[condition_count]=0;
                                     } else {
-                                            condition_etat=1;
-                                            CONDITION[condition_count]=1;
+                                        condition_etat=1;
+                                        CONDITION[condition_count]=1;
                                     }
                                 } else if (regex_match(tmp,"\\(.*==.*\\)")==0){ //si condition de type égal
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*==)"),strlen(regex(tmp,"(\\(.*==)"))-2,2,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(==.*\\))"),strlen(regex(tmp,"(==.*\\))"))-1,1,""),0,2,"");
                                     if (strcmp(var_name, var_value)==0) {
-                                            condition_etat=1;
-                                            CONDITION[condition_count]=1;
+                                        condition_etat=1;
+                                        CONDITION[condition_count]=1;
                                     } else {
-                                            condition_etat=0;
-                                            CONDITION[condition_count]=0;
+                                        condition_etat=0;
+                                        CONDITION[condition_count]=0;
                                     }
                                 } else if (regex_match(tmp,"\\(.*>=.*\\)")==0){ //si condition de type plus grand ou égal
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*>=)"),strlen(regex(tmp,"(\\(.*>=)"))-2,2,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(>=.*\\))"),strlen(regex(tmp,"(>=.*\\))"))-1,1,""),0,2,"");
                                     if (str2int(var_name)>=str2int(var_value)) {
-                                            condition_etat=1;
-                                            CONDITION[condition_count]=1;
+                                        condition_etat=1;
+                                        CONDITION[condition_count]=1;
                                     } else {
-                                            condition_etat=0;
-                                            CONDITION[condition_count]=0;
+                                        condition_etat=0;
+                                        CONDITION[condition_count]=0;
                                     }
                                 } else if (regex_match(tmp,"\\(.*>.*\\)")==0){ //si condition de type plus grand
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*>)"),strlen(regex(tmp,"(\\(.*>)"))-1,1,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(>.*\\))"),strlen(regex(tmp,"(>.*\\))"))-1,1,""),0,1,"");
                                     if (str2int(var_name)>str2int(var_value)) {
-                                            condition_etat=1;
-                                            CONDITION[condition_count]=1;
+                                        condition_etat=1;
+                                        CONDITION[condition_count]=1;
                                     } else {
-                                            condition_etat=0;
-                                            CONDITION[condition_count]=0;
+                                        condition_etat=0;
+                                        CONDITION[condition_count]=0;
                                     }
                                 } else if (regex_match(tmp,"\\(.*<=.*\\)")==0){ //si condition de type plus petit ou égal
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*<=)"),strlen(regex(tmp,"(\\(.*<=)"))-2,2,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(<=.*\\))"),strlen(regex(tmp,"(<=.*\\))"))-1,1,""),0,2,"");
                                     if (str2int(var_name)<=str2int(var_value)) {
-                                            condition_etat=1;
-                                            CONDITION[condition_count]=1;
+                                        condition_etat=1;
+                                        CONDITION[condition_count]=1;
                                     } else {
-                                            condition_etat=0;
-                                            CONDITION[condition_count]=0;
+                                        condition_etat=0;
+                                        CONDITION[condition_count]=0;
                                     }
                                 } else if (regex_match(tmp,"\\(.*<.*\\)")==0){ //si condition de type plus petit
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*<)"),strlen(regex(tmp,"(\\(.*<)"))-1,1,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(<.*\\))"),strlen(regex(tmp,"(<.*\\))"))-1,1,""),0,1,"");
                                     if (str2int(var_name)<str2int(var_value)) {
-                                            condition_etat=1;
-                                            CONDITION[condition_count]=1;
+                                        condition_etat=1;
+                                        CONDITION[condition_count]=1;
                                     } else {
-                                            condition_etat=0;
-                                            CONDITION[condition_count]=0;
+                                        condition_etat=0;
+                                        CONDITION[condition_count]=0;
                                     }
                                 }
                             } else if (regex_match_const(tmp,TOKEN_ELSE_1)==0 || regex_match_const(tmp,TOKEN_ELSE_2)==0 || regex_match_const(tmp,TOKEN_ELSE_3)==0 || regex_match_const(tmp,TOKEN_ELSE_4)==0){ 
@@ -389,6 +410,24 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                     case '$':
                         display_var=1;
                         break;
+                    case 's':
+                        if (display_var!=1) {
+                            if (display_var==2) {
+                                strncat(tmp_tmp, &c, 1);
+                                continue;
+                            } else if (i==0) {
+                                if (c==' ' && multiline==0) { ctmp=1; continue; }
+                            } else {
+                                if (c==' ' && ctmp==1 && multiline==0) {  continue;}
+                                ctmp=0;
+                            }
+                            strncat(tmp, &c, 1);
+                            display_var_session=0;
+                            break;
+                        } else {
+                            display_var_session=1;
+                        }
+                        break;
                     case '[':
                         if (display_var==1) {
                             display_var=2;
@@ -400,7 +439,12 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                     case ']':
                         if (display_var==2) {
                             display_var=0;
-                            strcat(tmp, afficherVariable(mes_variables, tmp_tmp));
+                            if (display_var_session!=1) {
+                                strcat(tmp, afficherVariable(mes_variables, tmp_tmp));
+                            } else {
+                                strcat(tmp, afficherVariable(mes_variables, tmp_tmp));
+                                display_var_session=0;
+                            }
                             //strcat(tmp, getVar(tmp_tmp,VARIABLES, ENV));
                         } else {
                             strncat(tmp, &c, 1);
@@ -443,36 +487,80 @@ int parseScript(FILE *SCRIPT, int pos_html) {
 }
 
 int main(int argc, char *argv[], char *envp[]) {
-    
-    char* GET;
-    if((GET=getenv("QUERY_STRING"))) {
-        urldecode(GET);
-        getVarsRequest(GET);
-    }
     char* REQUESTMETHOD;
     char *POST ;
     int fileup=0;
     REQUESTMETHOD=getenv("REQUEST_METHOD");
+    char* GET;
+    if((str_istr(REQUESTMETHOD,"GET")> -1 ) && (GET=getenv("QUERY_STRING"))) {
+        urldecode(GET);
+        getVarsRequest(GET);
+    }
+    char* COOKIE;
+    if((COOKIE=getenv("HTTP_COOKIE"))) {
+        urldecode(COOKIE);
+        getVarsRequest(COOKIE);
+    }
+    
     if (str_istr(REQUESTMETHOD,"POST")> -1 ) {
         int content_length;
         if ( strcasecmp(getenv("CONTENT_TYPE"), "application/x-www-form-urlencoded")) {
             if( strcmp(getenv("CONTENT_TYPE"), "multipart/form-data")) {
                 //Upload file
                 fileup=uploadFile();
-            } else dbg("LeeWee: Unsupported Content-Type.\n") ;
+            } else {
+                printf("Content-type: text/html;charset=utf-8\n\n");
+                printf("LeeWee: Unsupported Content-Type.\n") ;
+                return 1;
+            }
         }
         if (fileup==0) {
-            if ( !(content_length = atoi(getenv("CONTENT_LENGTH"))))
-                dbg("LeeWee: No Content-Length was sent with the POST request.\n") ;
-            if ( !(POST= (char *) malloc(content_length+1)))
-                dbg("LeeWee: Couldn't malloc for POST.\n");
-            if (!fread(POST, content_length, 1, stdin))
-                dbg("LeeWee: Couldn't read CGI input from STDIN.\n");
+            if ( !(content_length = atoi(getenv("CONTENT_LENGTH")))) {
+                printf("Content-type: text/html;charset=utf-8\n\n");
+                printf("LeeWee: No Content-Length was sent with the POST request.\n") ;
+                return 1;
+            }
+            if ( !(POST= (char *) malloc(content_length+1))) {
+                printf("Content-type: text/html;charset=utf-8\n\n");
+                printf("LeeWee: Couldn't malloc for POST.\n");
+                return 1;
+            }
+            if (!fread(POST, content_length, 1, stdin)) {
+                printf("Content-type: text/html;charset=utf-8\n\n");
+                printf("LeeWee: Couldn't read CGI input from STDIN.\n");
+                return 1;
+            }
             urldecode(POST);
             getVarsRequest(POST);
-            
         }
     }
+    
+    /* TIMESTAMP */
+    struct timespec tms;
+    /* seconds, multiplied with 1 million */
+    int64_t timestamp = tms.tv_sec * 1000000;
+    /* Add full microseconds */
+    timestamp += tms.tv_nsec/1000;
+    /* round up if necessary */
+    if (tms.tv_nsec % 1000 >= 500) { ++timestamp; }
+    /* TIMESTAMP */
+    
+    if (strcmp(afficherVariable(mes_variables, "LW_SESSION"), "")!=0) {
+        if (parseScript(fopen(afficherVariable(mes_variables, "LW_SESSION"),"r"), 0)!=0){
+            printf("Set-Cookie: LW_SESSION=%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
+            char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
+            sprintf(session_name, "%"PRId64"", timestamp);
+            FILE *sessionfile = fopen(session_name, "wb");
+            fclose(sessionfile);
+        }
+    } else {
+        printf("Set-Cookie: LW_SESSION=%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
+        char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
+        sprintf(session_name, "%"PRId64"", timestamp);
+        FILE *sessionfile = fopen(session_name, "wb");
+        fclose(sessionfile);
+    }
+    
     if (parseScript(fopen(argv[1],"r"), 0)==0){
         libererListeVariables(mes_variables);
         return 0;
