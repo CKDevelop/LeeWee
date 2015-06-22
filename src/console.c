@@ -48,18 +48,18 @@ char * shell(const char * str) {
         exit(1);
     }
     strcpy(output,buff);
-    int a=0;
-    int npos=-1;
+/*    int a=0;*/
+/*    int npos=-1;*/
     while(fgets(buff, sizeof(buff), in)!=NULL){
-        if (a>0) {
-            if (a==1 && npos > -1 ) strcat(output,"<br>");
-            str_replace_first(buff,"\n", "<br>");
-        } else {
-            npos=str_istr(buff,"\n");
-        }
-        str_replace_first(buff,"   ", "&nbsp;");
+/*        if (a>0) {*/
+/*            if (a==1 && npos > -1 ) strcat(output,"<br>");*/
+/*            str_replace_first(buff,"\n", "<br>");*/
+/*        } else {*/
+/*            npos=str_istr(buff,"\n");*/
+/*        }*/
+        //str_replace_first(buff,"   ", "&nbsp;");
         strcat(output,buff);
-        a++;
+/*        a++;*/
     }
     pclose(in);
     return output;

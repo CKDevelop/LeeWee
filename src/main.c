@@ -14,7 +14,11 @@
 #include <locale.h>
 #include <wchar.h>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #define LG_MAX 40960
+
 
 #include "regex.c"
 #include "regex_const.c"
@@ -104,9 +108,11 @@ int update_session_file(char *fInName, char *cmp, char *out, int multiline)
             if (regex_match(ligne,"^\\$.*=.*$")==0 || oneline_var==0) {
                 oneline_var=0;
                 fputs(ligne, fOut); 
+                if (str_istr(ligne, "\n")<0 ) fputc('\n',fOut);
             }
         } else if (session_var==1 && (regex_match(ligne,"^\\$.*=.*$")==0)) {
             fputs(ligne, fOut); 
+            if (str_istr(ligne, "\n")<0 ) fputc('\n',fOut);
             session_var=0;
         } else {
             if (multiline==1) session_var=1;
@@ -269,48 +275,56 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     update_session_file(afficherVariable(mes_variables, "LW_SESSION"), tmp_tmp_tmp, str_replace(tmp, 0, 2, "$"), 0);
                                 }
                             /*si la ligne vaut $var=<? cmd*/
-                            } else if ((regex_match_const(tmp,TOKEN_VAR_START_1)==0 || regex_match_const(tmp,TOKEN_VAR_START_2)==0) && (multiline==0) && (condition_etat!=1)){
-                                tmp_tmp=regex(tmp,"(<\\?.*$)");
-                                tmp_tmp=str_replace(tmp_tmp,0,2,"");
-                                //printf("%s\033[0m\n",tmp_tmp);
-                                strncat(tmp, "\n", 1);
-                                multiline=1;
-                                session_var=0;
-                            /*si la ligne vaut s$var=<? cmd*/
-                            } else if ((regex_match_const(tmp,TOKEN_VAR_SESSION_START_1)==0 || regex_match_const(tmp,TOKEN_VAR_SESSION_START_2)==0) && (multiline==0) && (condition_etat!=1)){
-                                tmp_tmp=regex(tmp,"(<\\?.*$)");
-                                tmp_tmp=str_replace(tmp_tmp,0,2,"");
-                                //printf("%s\033[0m\n",tmp_tmp);
-                                strncat(tmp, "\n", 1);
-                                multiline=1;
-                                session_var=1;
-
-                            /*si la ligne vaut cmd ?>*/
-                            } else if (regex_match_const(tmp,TOKEN_VAR_END_1_2)==0 && (condition_etat!=1)){
-                                if (regex_match(tmp,"^.*\\?>$")==0 ) {
-                                    if (session_var==1) var_name=regex_const(regex_const(tmp,TOKEN_VAR_SESSION_NAME_1),TOKEN_VAR_NAME_2);
-                                    else var_name=regex_const(regex_const(tmp,TOKEN_VAR_NAME_1),TOKEN_VAR_NAME_2);
-                                    tmp_tmp=regex(tmp,"(.*\\?>$)");
-                                    pstr=str_istr(tmp_tmp,"?>");
-                                    tmp_tmp=str_replace(tmp_tmp,pstr,2,"");
-                                    pstr=str_istr(tmp_tmp,"<?");
-                                    tmp_tmp=str_replace(tmp_tmp,pstr,2,"");
-                                    strcpy(tmp_tmp_tmp,tmp_tmp);
-                                    tableau_value=str_split(tmp_tmp_tmp, "=");
-                                    pstr=str_istr(tmp_tmp, tableau_value[0]);
-                                    tmp_tmp=str_replace(tmp_tmp,pstr,strlen(tableau_value[0])+1,"");
-                                    var_value=shell(tmp_tmp);
-                                    libererVariable(mes_variables, var_name);
-                                    mes_variables=ajouterVariable(mes_variables, var_name, var_value);
-                                    sprintf(tmp_tmp_tmp, "$%s", var_name);
-                                    if (session_var==1) {
-                                        update_session_file(afficherVariable(mes_variables, "LW_SESSION"), tmp_tmp_tmp, str_replace(tmp, 0, 2, "$"), 1);
-                                    }
+                            } else if ((regex_match_const(tmp,TOKEN_VAR_START_1)==0 || regex_match_const(tmp,TOKEN_VAR_START_2)==0) && (multiline==0)){
+                                if ((condition==1 && condition_etat >0) || (condition==0)) {
+                                    tmp_tmp=regex(tmp,"(<\\?.*$)");
+                                    tmp_tmp=str_replace(tmp_tmp,0,2,"");
+                                    //printf("%s\033[0m\n",tmp_tmp);
+                                    strncat(tmp, "\n", 1);
+                                    multiline=1;
                                     session_var=0;
                                 }
-                                multiline=0;
-                            } else if (multiline==1 && (condition_etat!=1)){
-                                strncat(tmp, "\n", 1);
+                            /*si la ligne vaut s$var=<? cmd*/
+                            } else if ((regex_match_const(tmp,TOKEN_VAR_SESSION_START_1)==0 || regex_match_const(tmp,TOKEN_VAR_SESSION_START_2)==0) && (multiline==0)){
+                                if ((condition==1 && condition_etat >0) || (condition==0)) {
+                                    tmp_tmp=regex(tmp,"(<\\?.*$)");
+                                    tmp_tmp=str_replace(tmp_tmp,0,2,"");
+                                    //printf("%s\033[0m\n",tmp_tmp);
+                                    strncat(tmp, "\n", 1);
+                                    multiline=1;
+                                    session_var=1;
+                                }
+
+                            /*si la ligne vaut cmd ?>*/
+                            } else if (regex_match_const(tmp,TOKEN_VAR_END_1_2)==0){
+                                if ((condition==1 && condition_etat >0) || (condition==0)) {
+                                    if (regex_match(tmp,"^.*\\?>$")==0 ) {
+                                        if (session_var==1) var_name=regex_const(regex_const(tmp,TOKEN_VAR_SESSION_NAME_1),TOKEN_VAR_NAME_2);
+                                        else var_name=regex_const(regex_const(tmp,TOKEN_VAR_NAME_1),TOKEN_VAR_NAME_2);
+                                        tmp_tmp=regex(tmp,"(.*\\?>$)");
+                                        pstr=str_istr(tmp_tmp,"?>");
+                                        tmp_tmp=str_replace(tmp_tmp,pstr,2,"");
+                                        pstr=str_istr(tmp_tmp,"<?");
+                                        tmp_tmp=str_replace(tmp_tmp,pstr,2,"");
+                                        strcpy(tmp_tmp_tmp,tmp_tmp);
+                                        tableau_value=str_split(tmp_tmp_tmp, "=");
+                                        pstr=str_istr(tmp_tmp, tableau_value[0]);
+                                        tmp_tmp=str_replace(tmp_tmp,pstr,strlen(tableau_value[0])+1,"");
+                                        var_value=shell(tmp_tmp);
+                                        libererVariable(mes_variables, var_name);
+                                        mes_variables=ajouterVariable(mes_variables, var_name, var_value);
+                                        sprintf(tmp_tmp_tmp, "$%s", var_name);
+                                        if (session_var==1) {
+                                            update_session_file(afficherVariable(mes_variables, "LW_SESSION"), tmp_tmp_tmp, str_replace(tmp, 0, 2, "$"), 1);
+                                        }
+                                        session_var=0;
+                                    }
+                                    multiline=0;
+                                }
+                            } else if (multiline==1){
+                                if ((condition==1 && condition_etat >0) || (condition==0)) {
+                                    strncat(tmp, "\n", 1);
+                                }
 
                             /*si la ligne vaut $var=str*/
                             } else if ((regex_match_const(tmp,TOKEN_VAR_3)==0) && (multiline==0)){
@@ -587,24 +601,26 @@ int main(int argc, char *argv[], char *envp[]) {
     /* round up if necessary */
     if (tms.tv_nsec % 1000 >= 500) { ++timestamp; }
     /* TIMESTAMP */
-    
+    mkdir("../.LWSESSION/", 0777); 
+    FILE *sessionfile = fopen("../.LWSESSION/index.html", "w");
+    fclose(sessionfile);
     if (strcmp(afficherVariable(mes_variables, "LW_SESSION"), "")!=0) {
         if (parseScript(fopen(afficherVariable(mes_variables, "LW_SESSION"),"r"), 0)!=0){
-            printf("Set-Cookie: LW_SESSION=../_%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
+            printf("Set-Cookie: LW_SESSION=../.LWSESSION/_%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
             char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
-            sprintf(session_name, "../_%"PRId64"", timestamp);
+            sprintf(session_name, "../.LWSESSION/_%"PRId64"", timestamp);
             mes_variables=ajouterVariable(mes_variables, "LW_SESSION", session_name);
-            FILE *sessionfile = fopen(session_name, "w");
+            sessionfile = fopen(session_name, "w");
             fclose(sessionfile);
         } else {
             printf("Set-Cookie: LW_SESSION=%s; expires=%u\n", afficherVariable(mes_variables, "LW_SESSION"),(unsigned)time(NULL)+900);
         }
     } else {
-        printf("Set-Cookie: LW_SESSION=../_%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
+        printf("Set-Cookie: LW_SESSION=../.LWSESSION/_%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
         char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
-        sprintf(session_name, "../_%"PRId64"", timestamp);
+        sprintf(session_name, "../.LWSESSION/_%"PRId64"", timestamp);
         mes_variables=ajouterVariable(mes_variables, "LW_SESSION", session_name);
-        FILE *sessionfile = fopen(session_name, "w");
+        sessionfile = fopen(session_name, "w");
         fclose(sessionfile);
     }
     
