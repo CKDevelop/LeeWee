@@ -80,6 +80,46 @@ int str2int(char *msg) {
     return OUT;
 }
 
+int update_session_file(char *fInName, char *cmp, char *out, int multiline) 
+{ 
+    char ligne[LG_MAX]; 
+    FILE * fIn; 
+    FILE * fOut; 
+    int session_var=0;
+    int oneline_var=0;
+    char *fOutName = (char *)malloc(sizeof(char) * LG_MAX);
+    sprintf(fOutName, "%s_tmp", fInName);
+  
+    if ((fIn = fopen(fInName, "r")) == NULL) return -1; 
+  
+    if ((fOut = fopen(fOutName, "w")) == NULL) { 
+        fclose(fIn);
+        return -1;
+    } 
+    while (fgets(ligne, sizeof ligne, fIn)) { 
+        if (str_istr(ligne, cmp)>-1 && multiline==0) {
+            oneline_var=1;
+        }
+        if (str_istr(ligne, cmp)<0 && session_var==0) {
+            if (regex_match(ligne,"^\\$.*=.*$")==0 || oneline_var==0) {
+                oneline_var=0;
+                fputs(ligne, fOut); 
+            }
+        } else if (session_var==1 && (regex_match(ligne,"^\\$.*=.*$")==0)) {
+            fputs(ligne, fOut); 
+            session_var=0;
+        } else {
+            if (multiline==1) session_var=1;
+        }
+    }
+    fputs(out,fOut);
+    fputc('\n',fOut);
+    fclose(fIn);
+    fclose(fOut);
+    rename(fOutName, fInName); 
+    return 0; 
+}
+
 int uploadFile() {
     int content_length;
     char *ligne_courante_tmp = (char *)malloc (sizeof(char) * LG_MAX);
@@ -169,7 +209,6 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         int i;
 
         char *ligne_courante = (char *)malloc (sizeof(char) * LG_MAX);
-        char *ligne_session = (char *)malloc (sizeof(char) * LG_MAX);
         //char *ligne_courante = (char*)calloc(U_MAX_BYTES + 1, sizeof(char)); 
         int pos_html2=pos_html;
         int ctmp=0;
@@ -185,10 +224,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         char *var_name=(char *)malloc (sizeof (char) * LG_MAX);
         char *var_value=(char *)malloc (sizeof (char) * LG_MAX);
 
-        FILE *sessionfile;
-        FILE *sessionfiletmp;
-/*        fclose(sessionfile);*/
-
+        int session_var=0;
         long tmppos ;
         int condition=0;
         int condition_count=-1;
@@ -228,6 +264,9 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     var_value=shell(tmp_tmp);
                                     libererVariable(mes_variables, var_name);
                                     mes_variables=ajouterVariable(mes_variables, var_name, var_value);
+                                    
+                                    sprintf(tmp_tmp_tmp, "$%s", var_name);
+                                    update_session_file(afficherVariable(mes_variables, "LW_SESSION"), tmp_tmp_tmp, str_replace(tmp, 0, 2, "$"), 0);
                                 }
                             /*si la ligne vaut $var=<? cmd*/
                             } else if ((regex_match_const(tmp,TOKEN_VAR_START_1)==0 || regex_match_const(tmp,TOKEN_VAR_START_2)==0) && (multiline==0) && (condition_etat!=1)){
@@ -236,6 +275,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                 //printf("%s\033[0m\n",tmp_tmp);
                                 strncat(tmp, "\n", 1);
                                 multiline=1;
+                                session_var=0;
                             /*si la ligne vaut s$var=<? cmd*/
                             } else if ((regex_match_const(tmp,TOKEN_VAR_SESSION_START_1)==0 || regex_match_const(tmp,TOKEN_VAR_SESSION_START_2)==0) && (multiline==0) && (condition_etat!=1)){
                                 tmp_tmp=regex(tmp,"(<\\?.*$)");
@@ -243,11 +283,13 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                 //printf("%s\033[0m\n",tmp_tmp);
                                 strncat(tmp, "\n", 1);
                                 multiline=1;
+                                session_var=1;
 
                             /*si la ligne vaut cmd ?>*/
                             } else if (regex_match_const(tmp,TOKEN_VAR_END_1_2)==0 && (condition_etat!=1)){
                                 if (regex_match(tmp,"^.*\\?>$")==0 ) {
-                                    var_name=regex_const(regex_const(tmp,TOKEN_VAR_NAME_1),TOKEN_VAR_NAME_2);
+                                    if (session_var==1) var_name=regex_const(regex_const(tmp,TOKEN_VAR_SESSION_NAME_1),TOKEN_VAR_NAME_2);
+                                    else var_name=regex_const(regex_const(tmp,TOKEN_VAR_NAME_1),TOKEN_VAR_NAME_2);
                                     tmp_tmp=regex(tmp,"(.*\\?>$)");
                                     pstr=str_istr(tmp_tmp,"?>");
                                     tmp_tmp=str_replace(tmp_tmp,pstr,2,"");
@@ -260,6 +302,11 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     var_value=shell(tmp_tmp);
                                     libererVariable(mes_variables, var_name);
                                     mes_variables=ajouterVariable(mes_variables, var_name, var_value);
+                                    sprintf(tmp_tmp_tmp, "$%s", var_name);
+                                    if (session_var==1) {
+                                        update_session_file(afficherVariable(mes_variables, "LW_SESSION"), tmp_tmp_tmp, str_replace(tmp, 0, 2, "$"), 1);
+                                    }
+                                    session_var=0;
                                 }
                                 multiline=0;
                             } else if (multiline==1 && (condition_etat!=1)){
@@ -288,23 +335,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     mes_variables=ajouterVariable(mes_variables, var_name, var_value);
                                     
                                     sprintf(tmp_tmp_tmp, "$%s", var_name);
-                                    sprintf(tmp_tmp, "%s_tmp", afficherVariable(mes_variables, "LW_SESSION"));
-                                    
-                                    sessionfile = fopen(afficherVariable(mes_variables, "LW_SESSION"), "r");
-                                    sessionfiletmp = fopen(tmp_tmp, "w+");
-                                   
-                                    while(fgets(ligne_session, LG_MAX, sessionfile) != NULL) {
-                                        if (str_istr(ligne_session, tmp_tmp_tmp)<0) {
-                                            fputs(ligne_session,sessionfiletmp);
-                                        }
-                                    }
-                                    fputs(str_replace(tmp, 0, 2, "$"),sessionfiletmp);
-                                    fputc('\n',sessionfiletmp);
-                                    fclose(sessionfile);
-                                    fclose(sessionfiletmp);
-                                    remove(afficherVariable(mes_variables, "LW_SESSION"));
-                                    rename(tmp_tmp, afficherVariable(mes_variables, "LW_SESSION"));
-                                    
+                                    update_session_file(afficherVariable(mes_variables, "LW_SESSION"), tmp_tmp_tmp, str_replace(tmp, 0, 2, "$"), 0);
                                 }
                             /*si la ligne vaut if(.*){ */
                             //imbriquation condition
@@ -501,11 +532,10 @@ int parseScript(FILE *SCRIPT, int pos_html) {
 int main(int argc, char *argv[], char *envp[]) {
     char* REQUESTMETHOD;
     char *POST ;
-    char *tmp = (char *)malloc(sizeof(char) * LG_MAX);
     int fileup=0;
     REQUESTMETHOD=getenv("REQUEST_METHOD");
     char* GET;
-    if((str_istr(REQUESTMETHOD,"GET")> -1 ) && (GET=getenv("QUERY_STRING"))) {
+    if(/*(str_istr(REQUESTMETHOD,"GET")> -1 ) &&*/ (GET=getenv("QUERY_STRING"))) {
         urldecode(GET);
         getVarsRequest(GET);
     }
@@ -558,14 +588,11 @@ int main(int argc, char *argv[], char *envp[]) {
     if (tms.tv_nsec % 1000 >= 500) { ++timestamp; }
     /* TIMESTAMP */
     
-/*    mkdir("sessions/", 0777);*/
-/*    FILE *sessiondir = fopen("sessions/index.html", "w");*/
-/*    fclose(sessiondir);*/
     if (strcmp(afficherVariable(mes_variables, "LW_SESSION"), "")!=0) {
         if (parseScript(fopen(afficherVariable(mes_variables, "LW_SESSION"),"r"), 0)!=0){
-            printf("Set-Cookie: LW_SESSION=../%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
+            printf("Set-Cookie: LW_SESSION=../_%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
             char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
-            sprintf(session_name, "../%"PRId64"", timestamp);
+            sprintf(session_name, "../_%"PRId64"", timestamp);
             mes_variables=ajouterVariable(mes_variables, "LW_SESSION", session_name);
             FILE *sessionfile = fopen(session_name, "w");
             fclose(sessionfile);
@@ -573,9 +600,9 @@ int main(int argc, char *argv[], char *envp[]) {
             printf("Set-Cookie: LW_SESSION=%s; expires=%u\n", afficherVariable(mes_variables, "LW_SESSION"),(unsigned)time(NULL)+900);
         }
     } else {
-        printf("Set-Cookie: LW_SESSION=../%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
+        printf("Set-Cookie: LW_SESSION=../_%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
         char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
-        sprintf(session_name, "../%"PRId64"", timestamp);
+        sprintf(session_name, "../_%"PRId64"", timestamp);
         mes_variables=ajouterVariable(mes_variables, "LW_SESSION", session_name);
         FILE *sessionfile = fopen(session_name, "w");
         fclose(sessionfile);
