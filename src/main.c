@@ -77,9 +77,14 @@ void dbgint(int msg) {
 
 int str2int(char *msg) {
     int OUT=0;
-    int ind;
-    for (ind = 0; ind < strlen(msg); ind++) {
-        OUT=OUT+(int)msg[ind];
+    //int ind;
+    if ( (regex_match(msg,"^[ 0-9]*$")==0) || (regex_match(msg,"^-+[ 0-9]*$")==0) || (regex_match(msg,"^[+]+[ 0-9]*$")==0) ) {
+        OUT=(int) strtol(str_strip(msg), (char **)NULL, 10);
+/*        for (ind = 0; ind < strlen(msg); ind++) {*/
+/*            OUT=OUT+(int)msg[ind];*/
+/*        }*/
+    } else {
+        OUT=(int)strlen(msg);
     }
     return OUT;
 }
@@ -458,10 +463,10 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                             } else if (regex_match_const(tmp,TOKEN_WHILE_1)==0 || regex_match_const(tmp,TOKEN_WHILE_2)==0 || regex_match_const(tmp,TOKEN_WHILE_3)==0 || regex_match_const(tmp,TOKEN_WHILE_4)==0) {
                                 //condition = 1 alors condition activé
                                 // condition_etat= 1 alors condition vraie
-                                
                                 condition=1;
                                 condition_count++; 
                                 CONDITION_TYPE[condition_count]=1;
+                                
                                 if (condition_count>0 && CONDITION[condition_count-1]==0){
                                     condition_etat=0;
                                     CONDITION_POS[condition_count]=currentpos;
@@ -515,17 +520,20 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                         CONDITION[condition_count]=0;
                                     }
                                 } else if (regex_match(tmp,"\\(.*<=.*\\)")==0){ //si condition de type plus petit ou égal
+                                    
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*<=)"),strlen(regex(tmp,"(\\(.*<=)"))-2,2,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(<=.*\\))"),strlen(regex(tmp,"(<=.*\\))"))-1,1,""),0,2,"");
                                     if (str2int(var_name)<=str2int(var_value)) {
                                         condition_etat=1;
                                         CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=1;
+                                        
                                     } else {
                                         condition_etat=0;
                                         CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=0;
                                     }
+                                    
                                 } else if (regex_match(tmp,"\\(.*<.*\\)")==0){ //si condition de type plus petit
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*<)"),strlen(regex(tmp,"(\\(.*<)"))-1,1,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(<.*\\))"),strlen(regex(tmp,"(<.*\\))"))-1,1,""),0,1,"");
@@ -558,15 +566,17 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     } else if (CONDITION_TYPE[condition_count]==1) {
 /*                                    printf("<p>fin condition While %d</p>", CONDITION[condition_count]);*/
                                         condition_count--;
-                                        if (condition_count>=0 ) {
+                                        if ((condition_count+1)>=0 ) {
                                             if (CONDITION[condition_count+1]==1){
                                                 condition_etat=1;
                                                 fseek( SCRIPT, CONDITION_POS[condition_count+1], SEEK_SET );
-                                                
+                                                condition=1;
                                             } else {
                                                 condition_etat=0;
+                                                if (condition_count+1==0) condition=0;
+                                                else condition=1;
                                             }
-                                            condition=1;
+                                            
                                         } else {
                                             condition=0;
                                             condition_etat=0;
@@ -738,7 +748,6 @@ int main(int argc, char *argv[], char *envp[]) {
         printf("Set-Cookie: LW_SESSION=%s; expires=%u\n", session_name,(unsigned)time(NULL)+900);
         mes_variables=ajouterVariable(mes_variables, "LW_SESSION", session_name);
     }
-    
     
     if (parseScript(fopen(argv[1],"r"), 0)==0){
         libererListeVariables(mes_variables);
