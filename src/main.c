@@ -244,7 +244,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         char **tableau_value = NULL;
         int CONDITION[LG_MAX];
         int CONDITION_POS[LG_MAX];
-        int CONDITION_TYPE[LG_MAX]; //0=if 1=while 3=for
+        int CONDITION_TYPE[LG_MAX]; //0=if 1=while
         while(fgets(ligne_courante, LG_MAX, SCRIPT) != NULL) {
             if (multiline==0) memset (tmp, 0, LG_MAX);
             currentpos=ftell(SCRIPT)-strlen(ligne_courante);
@@ -547,7 +547,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                         CONDITION[condition_count]=0;
                                     }
                                 }
-/*****************************************FOR********************************/
+/*****************************************FIN CONDITION********************************/
                             } else if (regex_match_const(tmp,TOKEN_IF_ELSE_END_1)==0){
                                     
                                     if (CONDITION_TYPE[condition_count]==0) {
