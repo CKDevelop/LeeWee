@@ -122,6 +122,27 @@ if ($[my_variable]!=) {
     variable empty
 }
 ```
+
+#CONDITION WHILE
+##Operator
+Operator  | Description
+----------| -------------
+==        | equal
+!=        | not equal
+<         | less than
+<=        | less than or equal
+>         | bigger than
+>=        | greater or equal
+
+##simple WHILE
+```
+$num=0
+while ($[num]<101) {
+    $[num]<br>
+    $num=<?echo -n "$(($[num]+1))" ?>
+}
+```
+
 #MARKER
 ##add a marker
 ```

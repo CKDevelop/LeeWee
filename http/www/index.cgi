@@ -23,6 +23,7 @@ done?>
                 <li><a href="?page=get">Variable GET</a></li>
                 <li><a href="?page=post">Variable POST</a></li>
                 <li><a href="?page=if">Condition IF</a></li>
+                <li><a href="?page=while">Condition WHILE</a></li>
             </ul>
         </fieldset>
         

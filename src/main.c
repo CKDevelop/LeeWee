@@ -93,10 +93,9 @@ int update_session_file(char *fInName, char *cmp, char *out, int multiline)
     int oneline_var=0;
     char *fOutName = (char *)malloc(sizeof(char) * LG_MAX);
     sprintf(fOutName, "%s_tmp", fInName);
+    if ((fIn = fopen(fInName, "r+")) == NULL) return -1; 
   
-    if ((fIn = fopen(fInName, "r")) == NULL) return -1; 
-  
-    if ((fOut = fopen(fOutName, "w")) == NULL) { 
+    if ((fOut = fopen(fOutName, "w+")) == NULL) { 
         fclose(fIn);
         return -1;
     } 
@@ -120,9 +119,10 @@ int update_session_file(char *fInName, char *cmp, char *out, int multiline)
     }
     fputs(out,fOut);
     fputc('\n',fOut);
-    fclose(fIn);
-    fclose(fOut);
+    //fclose(fIn);
+    //fclose(fOut);
     rename(fOutName, fInName); 
+    fclose(fOut);
     return 0; 
 }
 
@@ -232,13 +232,17 @@ int parseScript(FILE *SCRIPT, int pos_html) {
 
         int session_var=0;
         long tmppos ;
+        long currentpos ;
         int condition=0;
         int condition_count=-1;
         int condition_etat=0;
         char **tableau_value = NULL;
         int CONDITION[LG_MAX];
+        int CONDITION_POS[LG_MAX];
+        int CONDITION_TYPE[LG_MAX]; //0=if 1=while 3=for
         while(fgets(ligne_courante, LG_MAX, SCRIPT) != NULL) {
             if (multiline==0) memset (tmp, 0, LG_MAX);
+            currentpos=ftell(SCRIPT)-strlen(ligne_courante);
             for(i=0;i<=strlen(ligne_courante);i++) {
                 c=ligne_courante[i];
                 switch(c) {
@@ -351,25 +355,29 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     sprintf(tmp_tmp_tmp, "$%s", var_name);
                                     update_session_file(afficherVariable(mes_variables, "LW_SESSION"), tmp_tmp_tmp, str_replace(tmp, 0, 2, "$"), 0);
                                 }
-                            /*si la ligne vaut if(.*){ */
-                            //imbriquation condition
+/*************************************CONDITION*****************************/
+/*****************************************IF********************************/
                             } else if (regex_match_const(tmp,TOKEN_IF_1)==0 || regex_match_const(tmp,TOKEN_IF_2)==0 || regex_match_const(tmp,TOKEN_IF_3)==0 || regex_match_const(tmp,TOKEN_IF_4)==0) {
                                 //condition = 1 alors condition activé
                                 // condition_etat= 1 alors condition vraie
                                 
                                 condition=1;
                                 condition_count++; 
+                                CONDITION_TYPE[condition_count]=0;
                                 if (condition_count>0 && CONDITION[condition_count-1]==0){
                                     condition_etat=0;
+                                    CONDITION_POS[condition_count]=currentpos;
                                     CONDITION[condition_count]=0;
                                 } else if (regex_match(tmp,"\\(.*!=.*\\)")==0){ //si condition de type pas égal
                                     var_name=str_replace(str_replace(regex(tmp,"(\\(.*!=)"),strlen(regex(tmp,"(\\(.*!=)"))-2,2,""),0,1,"");
                                     var_value=str_replace(str_replace(regex(tmp,"(!=.*\\))"),strlen(regex(tmp,"(!=.*\\))"))-1,1,""),0,2,"");
                                     if (strcmp(var_name, var_value)==0) {
                                         condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=0;
                                     } else {
                                         condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=1;
                                     }
                                 } else if (regex_match(tmp,"\\(.*==.*\\)")==0){ //si condition de type égal
@@ -377,9 +385,11 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     var_value=str_replace(str_replace(regex(tmp,"(==.*\\))"),strlen(regex(tmp,"(==.*\\))"))-1,1,""),0,2,"");
                                     if (strcmp(var_name, var_value)==0) {
                                         condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=1;
                                     } else {
                                         condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=0;
                                     }
                                 } else if (regex_match(tmp,"\\(.*>=.*\\)")==0){ //si condition de type plus grand ou égal
@@ -387,9 +397,11 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     var_value=str_replace(str_replace(regex(tmp,"(>=.*\\))"),strlen(regex(tmp,"(>=.*\\))"))-1,1,""),0,2,"");
                                     if (str2int(var_name)>=str2int(var_value)) {
                                         condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=1;
                                     } else {
                                         condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=0;
                                     }
                                 } else if (regex_match(tmp,"\\(.*>.*\\)")==0){ //si condition de type plus grand
@@ -397,9 +409,11 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     var_value=str_replace(str_replace(regex(tmp,"(>.*\\))"),strlen(regex(tmp,"(>.*\\))"))-1,1,""),0,1,"");
                                     if (str2int(var_name)>str2int(var_value)) {
                                         condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=1;
                                     } else {
                                         condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=0;
                                     }
                                 } else if (regex_match(tmp,"\\(.*<=.*\\)")==0){ //si condition de type plus petit ou égal
@@ -407,9 +421,11 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     var_value=str_replace(str_replace(regex(tmp,"(<=.*\\))"),strlen(regex(tmp,"(<=.*\\))"))-1,1,""),0,2,"");
                                     if (str2int(var_name)<=str2int(var_value)) {
                                         condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=1;
                                     } else {
                                         condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=0;
                                     }
                                 } else if (regex_match(tmp,"\\(.*<.*\\)")==0){ //si condition de type plus petit
@@ -417,12 +433,15 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     var_value=str_replace(str_replace(regex(tmp,"(<.*\\))"),strlen(regex(tmp,"(<.*\\))"))-1,1,""),0,1,"");
                                     if (str2int(var_name)<str2int(var_value)) {
                                         condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=1;
                                     } else {
                                         condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
                                         CONDITION[condition_count]=0;
                                     }
                                 }
+/*****************************************ELSE********************************/
                             } else if (regex_match_const(tmp,TOKEN_ELSE_1)==0 || regex_match_const(tmp,TOKEN_ELSE_2)==0 || regex_match_const(tmp,TOKEN_ELSE_3)==0 || regex_match_const(tmp,TOKEN_ELSE_4)==0){ 
                                 condition=1;
                                     if (condition_count>0 && CONDITION[condition_count-1]==0){
@@ -435,18 +454,123 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                         CONDITION[condition_count]=1;
                                         condition_etat=1;
                                     }
-                            } else if (regex_match_const(tmp,TOKEN_IF_ELSE_END_1)==0){
-                                    condition_count--;
-                                    if (condition_count>=0 ) {
-                                        if (CONDITION[condition_count]==1){
-                                        condition_etat=1;
-                                        }else {
+/*****************************************WHILE********************************/
+                            } else if (regex_match_const(tmp,TOKEN_WHILE_1)==0 || regex_match_const(tmp,TOKEN_WHILE_2)==0 || regex_match_const(tmp,TOKEN_WHILE_3)==0 || regex_match_const(tmp,TOKEN_WHILE_4)==0) {
+                                //condition = 1 alors condition activé
+                                // condition_etat= 1 alors condition vraie
+                                
+                                condition=1;
+                                condition_count++; 
+                                CONDITION_TYPE[condition_count]=1;
+                                if (condition_count>0 && CONDITION[condition_count-1]==0){
+                                    condition_etat=0;
+                                    CONDITION_POS[condition_count]=currentpos;
+                                    CONDITION[condition_count]=0;
+                                } else if (regex_match(tmp,"\\(.*!=.*\\)")==0){ //si condition de type pas égal
+                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*!=)"),strlen(regex(tmp,"(\\(.*!=)"))-2,2,""),0,1,"");
+                                    var_value=str_replace(str_replace(regex(tmp,"(!=.*\\))"),strlen(regex(tmp,"(!=.*\\))"))-1,1,""),0,2,"");
+                                    if (strcmp(var_name, var_value)==0) {
                                         condition_etat=0;
-                                        }
-                                        condition=1;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=0;
                                     } else {
-                                        condition=0;
+                                        condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=1;
+                                    }
+                                } else if (regex_match(tmp,"\\(.*==.*\\)")==0){ //si condition de type égal
+                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*==)"),strlen(regex(tmp,"(\\(.*==)"))-2,2,""),0,1,"");
+                                    var_value=str_replace(str_replace(regex(tmp,"(==.*\\))"),strlen(regex(tmp,"(==.*\\))"))-1,1,""),0,2,"");
+                                    if (strcmp(var_name, var_value)==0) {
+                                        condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=1;
+                                    } else {
                                         condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=0;
+                                    }
+                                } else if (regex_match(tmp,"\\(.*>=.*\\)")==0){ //si condition de type plus grand ou égal
+                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*>=)"),strlen(regex(tmp,"(\\(.*>=)"))-2,2,""),0,1,"");
+                                    var_value=str_replace(str_replace(regex(tmp,"(>=.*\\))"),strlen(regex(tmp,"(>=.*\\))"))-1,1,""),0,2,"");
+                                    if (str2int(var_name)>=str2int(var_value)) {
+                                        condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=1;
+                                    } else {
+                                        condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=0;
+                                    }
+                                } else if (regex_match(tmp,"\\(.*>.*\\)")==0){ //si condition de type plus grand
+                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*>)"),strlen(regex(tmp,"(\\(.*>)"))-1,1,""),0,1,"");
+                                    var_value=str_replace(str_replace(regex(tmp,"(>.*\\))"),strlen(regex(tmp,"(>.*\\))"))-1,1,""),0,1,"");
+                                    if (str2int(var_name)>str2int(var_value)) {
+                                        condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=1;
+                                    } else {
+                                        condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=0;
+                                    }
+                                } else if (regex_match(tmp,"\\(.*<=.*\\)")==0){ //si condition de type plus petit ou égal
+                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*<=)"),strlen(regex(tmp,"(\\(.*<=)"))-2,2,""),0,1,"");
+                                    var_value=str_replace(str_replace(regex(tmp,"(<=.*\\))"),strlen(regex(tmp,"(<=.*\\))"))-1,1,""),0,2,"");
+                                    if (str2int(var_name)<=str2int(var_value)) {
+                                        condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=1;
+                                    } else {
+                                        condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=0;
+                                    }
+                                } else if (regex_match(tmp,"\\(.*<.*\\)")==0){ //si condition de type plus petit
+                                    var_name=str_replace(str_replace(regex(tmp,"(\\(.*<)"),strlen(regex(tmp,"(\\(.*<)"))-1,1,""),0,1,"");
+                                    var_value=str_replace(str_replace(regex(tmp,"(<.*\\))"),strlen(regex(tmp,"(<.*\\))"))-1,1,""),0,1,"");
+                                    if (str2int(var_name)<str2int(var_value)) {
+                                        condition_etat=1;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=1;
+                                    } else {
+                                        condition_etat=0;
+                                        CONDITION_POS[condition_count]=currentpos;
+                                        CONDITION[condition_count]=0;
+                                    }
+                                }
+/*****************************************FOR********************************/
+                            } else if (regex_match_const(tmp,TOKEN_IF_ELSE_END_1)==0){
+                                    
+                                    if (CONDITION_TYPE[condition_count]==0) {
+                                        condition_count--;
+                                        if (condition_count>=0 ) {
+                                            if (CONDITION[condition_count]==1){
+                                                condition_etat=1;
+                                            }else {
+                                                condition_etat=0;
+                                            }
+                                            condition=1;
+                                        } else {
+                                            condition=0;
+                                            condition_etat=0;
+                                        }
+                                    } else if (CONDITION_TYPE[condition_count]==1) {
+/*                                    printf("<p>fin condition While %d</p>", CONDITION[condition_count]);*/
+                                        condition_count--;
+                                        if (condition_count>=0 ) {
+                                            if (CONDITION[condition_count+1]==1){
+                                                condition_etat=1;
+                                                fseek( SCRIPT, CONDITION_POS[condition_count+1], SEEK_SET );
+                                                
+                                            } else {
+                                                condition_etat=0;
+                                            }
+                                            condition=1;
+                                        } else {
+                                            condition=0;
+                                            condition_etat=0;
+                                        }
                                     }
                             } else if (regex_match_const(tmp,TOKEN_INCLUDE_1)==0 || regex_match_const(tmp,TOKEN_INCLUDE_2)==0){ //function include
                                 if ((condition==1 && condition_etat > 0) || (condition==0)) {
@@ -543,6 +667,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
 
 }
 
+
 int main(int argc, char *argv[], char *envp[]) {
     char* REQUESTMETHOD;
     char *POST ;
@@ -592,36 +717,26 @@ int main(int argc, char *argv[], char *envp[]) {
         }
     }
     
-    /* TIMESTAMP */
-    struct timespec tms;
-    /* seconds, multiplied with 1 million */
-    int64_t timestamp = tms.tv_sec * 1000000;
-    /* Add full microseconds */
-    timestamp += tms.tv_nsec/1000;
-    /* round up if necessary */
-    if (tms.tv_nsec % 1000 >= 500) { ++timestamp; }
-    /* TIMESTAMP */
-    mkdir("../.LWSESSION/", 0777); 
-    FILE *sessionfile = fopen("../.LWSESSION/index.html", "w");
-    fclose(sessionfile);
+    
+    time_t timestamp;
+    time(&timestamp);
+    
+    char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
+    sprintf(session_name, "LW_%lu", timestamp);
+
     if (strcmp(afficherVariable(mes_variables, "LW_SESSION"), "")!=0) {
+
         if (parseScript(fopen(afficherVariable(mes_variables, "LW_SESSION"),"r"), 0)!=0){
-            printf("Set-Cookie: LW_SESSION=../.LWSESSION/_%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
-            char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
-            sprintf(session_name, "../.LWSESSION/_%"PRId64"", timestamp);
+            //fclose(fopen(session_name, "w+"));
+            printf("Set-Cookie: LW_SESSION=%s; expires=%u\n", session_name,(unsigned)time(NULL)+900);
             mes_variables=ajouterVariable(mes_variables, "LW_SESSION", session_name);
-            sessionfile = fopen(session_name, "w");
-            fclose(sessionfile);
         } else {
             printf("Set-Cookie: LW_SESSION=%s; expires=%u\n", afficherVariable(mes_variables, "LW_SESSION"),(unsigned)time(NULL)+900);
         }
     } else {
-        printf("Set-Cookie: LW_SESSION=../.LWSESSION/_%"PRId64"; expires=%u\n", timestamp,(unsigned)time(NULL)+900);
-        char *session_name=(char *)malloc (sizeof (char) * LG_MAX);
-        sprintf(session_name, "../.LWSESSION/_%"PRId64"", timestamp);
+        //fclose(fopen(session_name, "w+"));
+        printf("Set-Cookie: LW_SESSION=%s; expires=%u\n", session_name,(unsigned)time(NULL)+900);
         mes_variables=ajouterVariable(mes_variables, "LW_SESSION", session_name);
-        sessionfile = fopen(session_name, "w");
-        fclose(sessionfile);
     }
     
     

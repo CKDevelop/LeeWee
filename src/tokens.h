@@ -39,6 +39,12 @@ const char TOKEN_WHILE_2[]="^while\\ *\\(.*\\)\\ *\\{";
 const char TOKEN_WHILE_3[]="^while\\(.*\\)\\ *\\{";
 const char TOKEN_WHILE_4[]="^while\\ *\\(.*\\)\\{";
 
+/*definitions for*/
+const char TOKEN_FOR_1[]="^for\\(.*\\)\\{";
+const char TOKEN_FOR_2[]="^for\\ *\\(.*\\)\\ *\\{";
+const char TOKEN_FOR_3[]="^for\\(.*\\)\\ *\\{";
+const char TOKEN_FOR_4[]="^for\\ *\\(.*\\)\\{";
+
 /*definitions marker*/
 const char TOKEN_MARKER_SET[]="^:.*";
 const char TOKEN_MARKER_GET[]="^->.*";
