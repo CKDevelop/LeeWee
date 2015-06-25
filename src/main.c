@@ -547,7 +547,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                         CONDITION[condition_count]=0;
                                     }
                                 }
-/*****************************************FIN CONDITION********************************/
+/*************************************FIN CONDITION****************************/
                             } else if (regex_match_const(tmp,TOKEN_IF_ELSE_END_1)==0){
                                     
                                     if (CONDITION_TYPE[condition_count]==0) {
@@ -572,8 +572,9 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                                 fseek( SCRIPT, CONDITION_POS[condition_count+1], SEEK_SET );
                                                 condition=1;
                                             } else {
-                                                condition_etat=0;
-                                                if (condition_count+1==0) condition=0;
+                                                if (CONDITION[condition_count]==1) condition_etat=1;
+                                                else condition_etat=0;
+                                                if (condition_count+1<=0) condition=0;
                                                 else condition=1;
                                             }
                                             
@@ -614,6 +615,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     printf("Content-type: text/html;charset=utf-8\n\n");
                                     pos_html2=1;
                                 }
+
                                     if (condition==1 && condition_etat > 0) printf("%s\n",tmp);
                                     else if (condition==0) printf("%s\n",tmp);
                             }

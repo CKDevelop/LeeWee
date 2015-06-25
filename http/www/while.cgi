@@ -1,8 +1,8 @@
-<h2>if.cgi</h2>
+<h2>while.cgi</h2>
 <fieldset>
     <legend>Condition WHILE</legend>
     #boucle d'entier
-    <p>boucle while d'entier :</p>
+    <h3>boucle while d'entier :</h3>
     $a=-5
     if ($[a]<=0) {
         while( $[a] <=5 ) {
@@ -10,16 +10,16 @@
             $a=<?echo -n "$(($[a]+1))" ?>
         }
     }
-    
-    <p>boucle while chaine de caractère :</p>
+    <hr>
+    <h3>boucle while chaine de caractère :</h3>
     $a=Za
     while ($[a]<=50) {
             $a=$[a]a
     }
     #$a=$[a]a
     $[a]Z
-    
-    <p>boucle while imbriquer :</p>
+    <hr>
+    <h3>boucle while imbriqué :</h3>
     $a=0
     if ($[a]<=0) {
         while( $[a] <10 ) {
@@ -32,16 +32,17 @@
                     $a=<?echo -n "$(($[a]+1))" ?>
                 }
             }
-            $a->$[a]<br>
-            if($[a]>=10) {
-                $b=0
-                while($[b]<=10) {
-                    $b=<?echo -n "$(($[b]+1))" ?>
-                }
+            <strong>$a->$[a]</strong><br>
+            $b=0
+            while($[b]<10) {
+                $b=<?echo -n "$(($[b]+1))" ?>
                 $b->$[b]<br>
             }
+            Fin While B<br>
         }
+        Fin While A<br>
     }
+    Fin condition A<=0<br>
 </fieldset>
 <br>
 
