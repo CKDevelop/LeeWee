@@ -25,6 +25,7 @@
 #include "str.c"
 #include "console.c"
 #include "markers.c"
+#include "functions.c"
 #include "variables.c"
 
 
@@ -233,6 +234,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         int display_var=0;
         
         char *var_name=(char *)malloc (sizeof (char) * LG_MAX);
+        char *tmp_var_name=(char *)malloc (sizeof (char) * LG_MAX);
         char *var_value=(char *)malloc (sizeof (char) * LG_MAX);
 
         int session_var=0;
@@ -244,7 +246,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         char **tableau_value = NULL;
         int CONDITION[LG_MAX];
         int CONDITION_POS[LG_MAX];
-        int CONDITION_TYPE[LG_MAX]; //0=if 1=while
+        int CONDITION_TYPE[LG_MAX]; //0=if 1=while 2=for 3=function
         while(fgets(ligne_courante, LG_MAX, SCRIPT) != NULL) {
             if (multiline==0) memset (tmp, 0, LG_MAX);
             currentpos=ftell(SCRIPT)-strlen(ligne_courante);
@@ -360,6 +362,19 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                     sprintf(tmp_tmp_tmp, "$%s", var_name);
                                     update_session_file(afficherVariable(mes_variables, "LW_SESSION"), tmp_tmp_tmp, str_replace(tmp, 0, 2, "$"), 0);
                                 }
+/*************************************FUNCTION*****************************/
+                            } else if (regex_match_const(tmp,TOKEN_FUNCTION_1)==0 || regex_match_const(tmp,TOKEN_FUNCTION_2)==0 || regex_match_const(tmp,TOKEN_FUNCTION_3)==0 || regex_match_const(tmp,TOKEN_FUNCTION_4)==0) {
+                                condition=1;
+                                condition_etat=0;
+                                condition_count++; 
+                                CONDITION_TYPE[condition_count]=3;
+                                CONDITION[condition_count]=0;
+                                tmp_var_name=regex_const(tmp,TOKEN_FUNCTION_NAME_1);
+                                //sprintf(tmp_var_name,"%s",var_name);
+                                //var_name=str_replace(tmp_tmp,0,-1,"");
+                                libererFonction(mes_fonctions, tmp_var_name);
+                                tmppos = ftell (SCRIPT);
+                                mes_fonctions=ajouterFonction(mes_fonctions, tmp_var_name, tmppos);
 /*************************************CONDITION*****************************/
 /*****************************************IF********************************/
                             } else if (regex_match_const(tmp,TOKEN_IF_1)==0 || regex_match_const(tmp,TOKEN_IF_2)==0 || regex_match_const(tmp,TOKEN_IF_3)==0 || regex_match_const(tmp,TOKEN_IF_4)==0) {
@@ -550,7 +565,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
 /*************************************FIN CONDITION****************************/
                             } else if (regex_match_const(tmp,TOKEN_IF_ELSE_END_1)==0){
                                     
-                                    if (CONDITION_TYPE[condition_count]==0) {
+                                    if (CONDITION_TYPE[condition_count]==0) { //si c'est une condition IF
                                         condition_count--;
                                         if (condition_count>=0 ) {
                                             if (CONDITION[condition_count]==1){
@@ -563,8 +578,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                             condition=0;
                                             condition_etat=0;
                                         }
-                                    } else if (CONDITION_TYPE[condition_count]==1) {
-/*                                    printf("<p>fin condition While %d</p>", CONDITION[condition_count]);*/
+                                    } else if (CONDITION_TYPE[condition_count]==1) { //si c'est une boucle WHILE
                                         condition_count--;
                                         if ((condition_count+1)>=0 ) {
                                             if (CONDITION[condition_count+1]==1){
@@ -582,7 +596,25 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                             condition=0;
                                             condition_etat=0;
                                         }
+                                    } else if (CONDITION_TYPE[condition_count]==3) { //si c'est une function
+                                        condition_count--;
+                                        condition=0;
+                                        condition_etat=0;
+                                        libererEndFonction(mes_endfonctions, tmp_var_name);
+                                        tmppos = ftell (SCRIPT);
+                                        mes_endfonctions=ajouterEndFonction(mes_endfonctions, tmp_var_name, tmppos);
+                                        
+                                        printf("<p>function %s {</p>", tmp_var_name);
+                                        printf("<p>    %ld</p>", afficherFonction(mes_fonctions,tmp_var_name));
+                                        printf("<p>    %ld</p>", afficherEndFonction(mes_endfonctions,tmp_var_name));
+                                        puts("<p>}</p>");
                                     }
+                            } else if (regex_match_const(tmp,TOKEN_FUNCTION_NAME_START)==0){ //function
+                                if ((condition==1 && condition_etat > 0) || (condition==0)) {
+                                    printf("<p>%s</p>", tmp);
+                                   //tmp_var_name=str_strip(tmp);
+                                    //fseek( SCRIPT, afficherFonction(mes_fonctions, tmp), SEEK_SET );
+                                }
                             } else if (regex_match_const(tmp,TOKEN_INCLUDE_1)==0 || regex_match_const(tmp,TOKEN_INCLUDE_2)==0){ //function include
                                 if ((condition==1 && condition_etat > 0) || (condition==0)) {
                                     char *tmp_include = (char *)malloc(sizeof(char) * LG_MAX);

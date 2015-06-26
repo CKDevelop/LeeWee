@@ -20,6 +20,7 @@ $titleIF=Exemple condition IF :
                 <li><a href="?page=session">Variable de SESSION</a></li>
                 <li><a href="?page=if">Condition IF</a></li>
                 <li><a href="?page=while">Condition WHILE</a></li>
+                <li><a href="?page=function">Gestion des FONCTIONS</a></li>
             </ul>
         </fieldset>
         

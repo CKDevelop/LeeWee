@@ -46,10 +46,12 @@ const char TOKEN_FOR_3[]="^for\\(.*\\)\\ *\\{";
 const char TOKEN_FOR_4[]="^for\\ *\\(.*\\)\\{";
 
 /*definitions function*/
-const char TOKEN_FUNCTION_1[]="^function\\(\\)\\{";
-const char TOKEN_FUNCTION_2[]="^function\\ *\\(\\)\\ *\\{";
-const char TOKEN_FUNCTION_3[]="^function\\(\\)\\ *\\{";
-const char TOKEN_FUNCTION_4[]="^function\\ *\\(\\)\\{";
+const char TOKEN_FUNCTION_1[]="^function\\ *.*\\(\\)\\{";
+const char TOKEN_FUNCTION_2[]="^function\\ *.*\\(\\)\\ *\\{";
+const char TOKEN_FUNCTION_3[]="^function\\ *.*\\(\\)\\ *\\{";
+const char TOKEN_FUNCTION_4[]="^function\\ *.*\\(\\)\\{";
+const char TOKEN_FUNCTION_NAME_1[]="[_[:alnum:]]+\\(\\)";
+const char TOKEN_FUNCTION_NAME_START[]="^[_[:alnum:]]+\\(\\)$";
 
 /*definitions marker*/
 const char TOKEN_MARKER_SET[]="^:.*";
