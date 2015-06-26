@@ -214,6 +214,7 @@ int uploadFile() {
     } else return 0;
 }
 
+
 //Analyse d'un script
 int parseScript(FILE *SCRIPT, int pos_html) {
     if (SCRIPT) {
@@ -226,7 +227,7 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         int ctmp=0;
         int multiline=0;
         int pstr=-1;
-        
+        char *tmp_var_name=(char *)malloc (sizeof (char) * LG_MAX);
         char *tmp = (char *)malloc(sizeof(char) * LG_MAX);
         char *tmp_tmp = (char *)malloc(sizeof(char) * LG_MAX);
         char *tmp_tmp_tmp = (char *)malloc(sizeof(char) * LG_MAX);
@@ -234,11 +235,12 @@ int parseScript(FILE *SCRIPT, int pos_html) {
         int display_var=0;
         
         char *var_name=(char *)malloc (sizeof (char) * LG_MAX);
-        char *tmp_var_name=(char *)malloc (sizeof (char) * LG_MAX);
+        
         char *var_value=(char *)malloc (sizeof (char) * LG_MAX);
 
         int session_var=0;
         long tmppos ;
+        long oldpos ;
         long currentpos ;
         int condition=0;
         int condition_count=-1;
@@ -370,7 +372,8 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                 CONDITION_TYPE[condition_count]=3;
                                 CONDITION[condition_count]=0;
                                 tmp_var_name=regex_const(tmp,TOKEN_FUNCTION_NAME_1);
-                                //sprintf(tmp_var_name,"%s",var_name);
+                                
+
                                 //var_name=str_replace(tmp_tmp,0,-1,"");
                                 libererFonction(mes_fonctions, tmp_var_name);
                                 tmppos = ftell (SCRIPT);
@@ -564,8 +567,10 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                 }
 /*************************************FIN CONDITION****************************/
                             } else if (regex_match_const(tmp,TOKEN_IF_ELSE_END_1)==0){
-                                    
-                                    if (CONDITION_TYPE[condition_count]==0) { //si c'est une condition IF
+                                //printf("%lu == %lu",afficherEndFonction(mes_endfonctions, tmp_var_name), ftell (SCRIPT));
+                                    if (afficherEndFonction(mes_endfonctions, tmp_var_name)== (ftell (SCRIPT)+strlen(tmp))) {
+                                        fseek( SCRIPT, oldpos, SEEK_SET );
+                                    } else if (CONDITION_TYPE[condition_count]==0) { //si c'est une condition IF
                                         condition_count--;
                                         if (condition_count>=0 ) {
                                             if (CONDITION[condition_count]==1){
@@ -597,23 +602,19 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                             condition_etat=0;
                                         }
                                     } else if (CONDITION_TYPE[condition_count]==3) { //si c'est une function
-                                        condition_count--;
-                                        condition=0;
-                                        condition_etat=0;
-                                        libererEndFonction(mes_endfonctions, tmp_var_name);
-                                        tmppos = ftell (SCRIPT);
-                                        mes_endfonctions=ajouterEndFonction(mes_endfonctions, tmp_var_name, tmppos);
-                                        
-                                        printf("<p>function %s {</p>", tmp_var_name);
-                                        printf("<p>    %ld</p>", afficherFonction(mes_fonctions,tmp_var_name));
-                                        printf("<p>    %ld</p>", afficherEndFonction(mes_endfonctions,tmp_var_name));
-                                        puts("<p>}</p>");
+                                            condition_count--;
+                                            condition=0;
+                                            condition_etat=0;
+                                            libererEndFonction(mes_endfonctions, tmp_var_name);
+                                            tmppos = ftell (SCRIPT)+strlen(tmp);
+                                            mes_endfonctions=ajouterEndFonction(mes_endfonctions, tmp_var_name, tmppos);
                                     }
                             } else if (regex_match_const(tmp,TOKEN_FUNCTION_NAME_START)==0){ //function
                                 if ((condition==1 && condition_etat > 0) || (condition==0)) {
-                                    printf("<p>%s</p>", tmp);
-                                   //tmp_var_name=str_strip(tmp);
-                                    //fseek( SCRIPT, afficherFonction(mes_fonctions, tmp), SEEK_SET );
+                                   tmp_var_name=str_strip(tmp);
+                                    oldpos=ftell (SCRIPT);
+                                    condition=0;
+                                    fseek( SCRIPT, afficherFonction(mes_fonctions, tmp), SEEK_SET );
                                 }
                             } else if (regex_match_const(tmp,TOKEN_INCLUDE_1)==0 || regex_match_const(tmp,TOKEN_INCLUDE_2)==0){ //function include
                                 if ((condition==1 && condition_etat > 0) || (condition==0)) {
