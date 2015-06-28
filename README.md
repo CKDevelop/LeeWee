@@ -143,7 +143,7 @@ while ($[num]<101) {
 }
 ```
 
-#MARKER
+#USING MARKER
 ##add a marker
 ```
 :marker_name
@@ -156,4 +156,23 @@ while ($[num]<101) {
 #INCLUDE A FILE
 ```
 include(filename.cgi)
+```
+
+#USING FUNCTION
+```
+function _test1() {
+    <h3>->Lecture de la fonction N&deg;1</h3>
+    _test2()
+    _test3()
+}
+function _test2() {
+    <h3>->Lecture de la fonction N&deg;2</h3>
+    include(scripting.cgi)
+}
+function _test3() {
+    <h3>->Lecture de la fonction N&deg;3</h3>
+    include(if.cgi)
+}
+#read function _test1
+_test1()
 ```

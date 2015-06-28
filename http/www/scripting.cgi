@@ -22,7 +22,6 @@ else:
 
 $mot=welcome
 $\$[mot]=$[title] in LeeWee Script
-        <h1>$[welcome]</h1>
         
         <fieldset>
             <strong>IP :</strong><br>

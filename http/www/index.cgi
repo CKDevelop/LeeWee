@@ -17,10 +17,10 @@ $titleIF=Exemple condition IF :
                 <li><a href="?page=scripting">Scripting</a></li>
                 <li><a href="?page=get">Variable GET</a></li>
                 <li><a href="?page=post">Variable POST</a></li>
-                <li><a href="?page=session">Variable de SESSION</a></li>
                 <li><a href="?page=if">Condition IF</a></li>
                 <li><a href="?page=while">Condition WHILE</a></li>
                 <li><a href="?page=function">Gestion des FONCTIONS</a></li>
+                <li><a href="?page=session"><span style="color:#c4a000;">[FIXME]</span> Variable de SESSION</a></li>
             </ul>
         </fieldset>
         

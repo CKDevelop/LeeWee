@@ -240,12 +240,13 @@ int parseScript(FILE *SCRIPT, int pos_html) {
 
         int session_var=0;
         long tmppos ;
-        long oldpos ;
         long currentpos ;
         int condition=0;
         int condition_count=-1;
+        int function_count=-1;
         int condition_etat=0;
         char **tableau_value = NULL;
+        int FUNCTION[LG_MAX];
         int CONDITION[LG_MAX];
         int CONDITION_POS[LG_MAX];
         int CONDITION_TYPE[LG_MAX]; //0=if 1=while 2=for 3=function
@@ -569,7 +570,8 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                             } else if (regex_match_const(tmp,TOKEN_IF_ELSE_END_1)==0){
                                 //printf("%lu == %lu",afficherEndFonction(mes_endfonctions, tmp_var_name), ftell (SCRIPT));
                                     if (afficherEndFonction(mes_endfonctions, tmp_var_name)== (ftell (SCRIPT)+strlen(tmp))) {
-                                        fseek( SCRIPT, oldpos, SEEK_SET );
+                                        function_count--;
+                                        fseek( SCRIPT, FUNCTION[function_count-1], SEEK_SET );
                                     } else if (CONDITION_TYPE[condition_count]==0) { //si c'est une condition IF
                                         condition_count--;
                                         if (condition_count>=0 ) {
@@ -603,8 +605,17 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                                         }
                                     } else if (CONDITION_TYPE[condition_count]==3) { //si c'est une function
                                             condition_count--;
-                                            condition=0;
-                                            condition_etat=0;
+                                            if (condition_count>=0 ) {
+                                                if (CONDITION[condition_count]==1){
+                                                    condition_etat=1;
+                                                }else {
+                                                    condition_etat=0;
+                                                }
+                                                condition=1;
+                                            } else {
+                                                condition=0;
+                                                condition_etat=0;
+                                            }
                                             libererEndFonction(mes_endfonctions, tmp_var_name);
                                             tmppos = ftell (SCRIPT)+strlen(tmp);
                                             mes_endfonctions=ajouterEndFonction(mes_endfonctions, tmp_var_name, tmppos);
@@ -612,9 +623,9 @@ int parseScript(FILE *SCRIPT, int pos_html) {
                             } else if (regex_match_const(tmp,TOKEN_FUNCTION_NAME_START)==0){ //function
                                 if ((condition==1 && condition_etat > 0) || (condition==0)) {
                                    tmp_var_name=str_strip(tmp);
-                                    oldpos=ftell (SCRIPT);
-                                    condition=0;
-                                    fseek( SCRIPT, afficherFonction(mes_fonctions, tmp), SEEK_SET );
+                                   function_count++;
+                                    FUNCTION[function_count]=ftell (SCRIPT);
+                                    fseek( SCRIPT, afficherFonction(mes_fonctions, tmp_var_name), SEEK_SET );
                                 }
                             } else if (regex_match_const(tmp,TOKEN_INCLUDE_1)==0 || regex_match_const(tmp,TOKEN_INCLUDE_2)==0){ //function include
                                 if ((condition==1 && condition_etat > 0) || (condition==0)) {
