@@ -8,70 +8,70 @@ craft@ckdevelop.org
 
 ![Logo LeeWee](https://github.com/davidlhoumaud/LeeWee/blob/master/thumbnail.jpg "Logo LeeWee")
 
-###An example script is available in the directory :
+### An example script is available in the directory :
 http/www/index.cgi 
 
-###Compilation :
+### Compilation :
 make
 
-###Test http://localhost:8080/index.cgi :
+### Test http://localhost:8080/index.cgi :
 make test
 
-###Install color scheme for gtksourceview :
+### Install color scheme for gtksourceview :
 make color
 
-###Uninstall color scheme for gtksourceview :
+### Uninstall color scheme for gtksourceview :
 make uncolor
 
-###Install binary file in /usr/bin/ :
+### Install binary file in /usr/bin/ :
 make install
 
-###Uninstall binary file of /usr/bin/ :
+### Uninstall binary file of /usr/bin/ :
 make uninstall
 
-###Delete binary file :
+### Delete binary file :
 make clean
 
 
 WIKI
 ====
 
-#assign a variable: 
+# assign a variable: 
 ```
 $my_variable=hello world !!
 ```
-#assign a variable session: 
+# assign a variable session: 
 ```
 s$my_variable=hello world !!
 ```
 
-#variable a display:
+# variable a display:
 ```
 $[my_variable]
 ```
 
-#naming a variable with another variable:
+# naming a variable with another variable:
 ```
 $namevar=my_variable
 $\$[namevar]=hello world !!
 ```
 
-#display this variable:
+# display this variable:
 ```
 $[my_variable]
 ```
 
-#execute a command:
+# execute a command:
 ```
 <?ls?>
 ```
-#execute a command and store it in a variable:
+# execute a command and store it in a variable:
 ```
 $my_variable=<?ls?>
 ```
 
-#execute and store the output of a python script or another language:
-##python:
+# execute and store the output of a python script or another language:
+## python:
 ```
 $python_example= <?python -c "print(\"$[my_variable], it is a python script !\")
 a=1
@@ -83,12 +83,12 @@ else:
 ?>
 ```
 
-##php:
+## php:
 ```
 $php_example=<?php -r "phpinfo();"?>
 ```
 
-#echo command Shell/Bash
+# echo command Shell/Bash
 ```
 $echo_example= <?echo -n "&lsaquo;strong&rsaquo;&lsaquo;strong&rsaquo;LS : &lsaquo;/strong&rsaquo;liste des fichiers et r&eacute;pertoires :&lsaquo;/strong&rsaquo;&lsaquo;br&rsaquo;"
 ls | while read line; do
@@ -96,8 +96,8 @@ ls | while read line; do
 done?>
 ```
 
-#CONDITION IF/ELSE
-##Operator
+# CONDITION IF/ELSE
+## Operator
 Operator  | Description
 ----------| -------------
 ==        | equal
@@ -107,14 +107,14 @@ Operator  | Description
 >         | bigger than
 >=        | greater or equal
 
-##simple IF
+## simple IF
 ```
 if ($[my_variable]==) {
     variable empty
 }
 ```
 
-##IF and ELSE
+## IF and ELSE
 ```
 if ($[my_variable]!=) {
     variable not empty
@@ -123,8 +123,8 @@ if ($[my_variable]!=) {
 }
 ```
 
-#CONDITION WHILE
-##Operator
+# CONDITION WHILE
+## Operator
 Operator  | Description
 ----------| -------------
 ==        | equal
@@ -134,7 +134,7 @@ Operator  | Description
 >         | bigger than
 >=        | greater or equal
 
-##simple WHILE
+## simple WHILE
 ```
 $num=0
 while ($[num]<101) {
@@ -143,22 +143,22 @@ while ($[num]<101) {
 }
 ```
 
-#USING MARKER
+# USING MARKER
 ##add a marker
 ```
 :marker_name
 ```
-##go to a marker
+## go to a marker
 ```
 ->marker_name
 ```
 
-#INCLUDE A FILE
+# INCLUDE A FILE
 ```
 include(filename.cgi)
 ```
 
-#USING FUNCTION
+# USING FUNCTION
 ```
 function _test1() {
     <h3>->Lecture de la fonction N&deg;1</h3>
