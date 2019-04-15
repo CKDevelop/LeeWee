@@ -104,8 +104,8 @@ Operator  | Description
 !=        | not equal
 <         | less than
 <=        | less than or equal
->         | bigger than
->=        | greater or equal
+\>         | bigger than
+\>=        | greater or equal
 
 ## simple IF
 ```
@@ -131,8 +131,8 @@ Operator  | Description
 !=        | not equal
 <         | less than
 <=        | less than or equal
->         | bigger than
->=        | greater or equal
+\>         | bigger than
+\>=        | greater or equal
 
 ## simple WHILE
 ```
